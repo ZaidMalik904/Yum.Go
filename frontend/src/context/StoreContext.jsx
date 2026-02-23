@@ -13,7 +13,7 @@ const StoreContextProvider = (props) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [discount, setDiscount] = useState(0);
 
-    const url = "http://localhost:4000";
+    const url = "https://yum-go.onrender.com";
 
     const addToCart = async (itemId) => {
         setCartItems((prev) => {
