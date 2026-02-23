@@ -1,0 +1,91 @@
+/* RestaurantDisplay.css */
+.restaurant-display {
+    scroll-margin-top: 100px;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.restaurant-card {
+    animation: fadeInScale 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.restaurant-card:hover .group-hover\:scale-110 {
+    transform: scale(1.1);
+}
+
+/* Glassmorphism utility if needed */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Custom shadow for premium cards */
+.shadow-premium {
+    box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.08);
+}
+
+.shadow-premium:hover {
+    box-shadow: 0 35px 60px -15px rgba(15, 23, 42, 0.12);
+}
+
+/* Staggered animation for children */
+.restaurant-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.restaurant-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.restaurant-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.restaurant-card:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.restaurant-card:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+.restaurant-card:nth-child(6) {
+    animation-delay: 0.6s;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .restaurant-display {
+        padding-top: 40px;
+        padding-bottom: 40px;
+    }
+
+    .restaurant-card {
+        border-radius: 28px;
+    }
+
+    .restaurant-card-img-container {
+        height: 220px;
+    }
+}

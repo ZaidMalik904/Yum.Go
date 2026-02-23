@@ -7,6 +7,10 @@ import cartRouter from './routes/cartRoute.js';
 import dotenv from "dotenv"
 dotenv.config()
 import orderRouter from './routes/orderRoute.js';
+import restaurantRouter from './routes/restaurantRoute.js';
+import supportRouter from './routes/supportRoute.js';
+import configRouter from './routes/configRoute.js';
+import reviewRouter from './routes/reviewRoute.js';
 
 //app config
 const app = express();
@@ -23,6 +27,10 @@ app.use('/images', express.static('uploads'));
 app.use("/api/user", userRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/order", orderRouter);
+app.use("/api/restaurant", restaurantRouter);
+app.use("/api/support", supportRouter);
+app.use("/api/config", configRouter);
+app.use("/api/review", reviewRouter);
 
 app.get('/', (req, res) => {
     res.send('API Working!');

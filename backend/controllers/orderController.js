@@ -29,13 +29,13 @@ const placeOrder = async (req, res) => {
 
     try {
         const newOrder = new orderModel({
-            userId: req.body.userId,
+            userId: req.userId,
             items: req.body.items,
             amount: req.body.amount,
             address: req.body.address
         });
         await newOrder.save();
-        await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
+        await userModel.findByIdAndUpdate(req.userId, { cartData: {} });
 
         const line_items = req.body.items.map((item) => ({
             price_data: {
@@ -92,7 +92,17 @@ const verifyOrder = async (req, res) => {
 // user orders
 const userOrders = async (req, res) => {
     try {
-        const orders = await orderModel.find({ userId: req.body.userId });
+        console.log("--- DEBUG: Fetching User Orders ---");
+        console.log("Requested userId from Token:", req.userId);
+
+        // Find ALL orders for this user string
+        const orders = await orderModel.find({ userId: req.userId }).sort({ date: -1 });
+
+        console.log("Database Query result length:", orders.length);
+        if (orders.length > 0) {
+            console.log("First Order UserID in DB:", orders[0].userId);
+        }
+
         res.json({ success: true, data: orders });
     } catch (error) {
         console.error("User orders error:", error);

@@ -1,3 +1,14 @@
+.app-content-wrapper {
+  display: flex;
+  width: 100%;
+}
+
+.admin-main {
+  flex: 1;
+  min-width: 0;
+  animation: fadeIn 0.3s ease-out;
+}
+
 .app-content {
   display: flex;
   justify-content: center;

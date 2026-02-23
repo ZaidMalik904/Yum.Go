@@ -1,41 +1,165 @@
 .sidebar {
     width: 18%;
     min-height: 100vh;
-    border-left: 1.5px solid #a9a9a9;
+    border-left: 1.5px solid #e2e8f0;
     border-top: 0;
-    font-size: max(1vw, 10px);
+    background-color: #ffffff;
+    font-family: 'Outfit', sans-serif;
+    transition: all 0.3s ease;
 }
 
 .sidebar-options {
     display: flex;
     flex-direction: column;
-    padding-top: 50px;
-    padding-left: 15%;
-    gap: 20px;
+    padding-top: 48px;
+    gap: 4px;
 }
 
+/* ── Main Nav Links ── */
 .sidebar-option {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 12px;
-    border: 1px solid #a9a9a9;
-    border-left: 0;
-    padding: 8px 10px;
-    border-radius: 0 3px 3px 0;
+    gap: 16px;
+    padding: 14px 16px 14px 32px;
     cursor: pointer;
+    color: #64748b;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.sidebar-option:hover {
+    background-color: #f8fafc;
+    color: #1e293b;
 }
 
 .sidebar-option.active {
-    background-color: #fff0ed;
-    border-color: tomato;
+    background-color: rgba(255, 240, 237, 0.4);
+    color: tomato;
+}
+
+/* Left indicator bar */
+.sidebar-option .indicator {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    border-radius: 0 999px 999px 0;
+    background-color: tomato;
+    transition: all 0.3s ease;
+    height: 0;
+    opacity: 0;
+}
+
+.sidebar-option:hover .indicator {
+    height: 16px;
+    opacity: 0.4;
+}
+
+.sidebar-option.active .indicator {
+    height: 32px;
+    opacity: 1;
+}
+
+/* Icon wrapper */
+.sidebar-option .icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.sidebar-option.active .icon-wrap {
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.sidebar-option .icon-wrap svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
 }
 
 .sidebar-option p {
     display: block;
+    font-weight: 700;
+    font-size: max(0.9vw, 13px);
+    letter-spacing: -0.02em;
+    white-space: nowrap;
 }
 
+/* ── Separator ── */
+.sidebar-separator {
+    margin: 24px 24px;
+    border: none;
+    border-top: 1px solid #f1f5f9;
+}
+
+/* ── Bottom Links (Settings, Help) ── */
+.sidebar-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sidebar-bottom-option {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px 12px 32px;
+    cursor: pointer;
+    color: #94a3b8;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.sidebar-bottom-option:hover {
+    color: #475569;
+}
+
+.sidebar-bottom-option.active {
+    color: tomato;
+}
+
+.sidebar-bottom-option .indicator {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    border-radius: 0 999px 999px 0;
+    background-color: tomato;
+    transition: all 0.3s ease;
+    height: 0;
+    opacity: 0;
+}
+
+.sidebar-bottom-option.active .indicator {
+    height: 24px;
+    opacity: 1;
+}
+
+.sidebar-bottom-option svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.sidebar-bottom-option p {
+    display: block;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+/* ── Responsive ── */
 @media (max-width: 900px) {
-    .sidebar-option p {
+
+    .sidebar-option p,
+    .sidebar-bottom-option p {
         display: none;
     }
 }

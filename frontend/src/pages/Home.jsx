@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 import Header from '../components/Header'
-import ExploreMenu from '../components/ExploreMenu'
-import FoodDisplay from '../components/FoodDisplay'
+import RestaurantDisplay from '../components/RestaurantDisplay/RestaurantDisplay'
 import AboutUs from '../components/AboutUs'
 import { StoreContext } from '../context/StoreContext'
 
@@ -13,7 +12,7 @@ const Home = ({ setShowLogin }) => {
     useEffect(() => {
         const sections = [
             { id: 'home', name: 'home' },
-            { id: 'explore-menu', name: 'menu' },
+            { id: 'restaurant-display', name: 'restaurants' },
             { id: 'about-us', name: 'about-us' },
             { id: 'footer', name: 'contact-us' }
         ];
@@ -21,7 +20,7 @@ const Home = ({ setShowLogin }) => {
         const observerOptions = {
             root: null,
             rootMargin: '0px',
-            threshold: 0.5 // Section is considered active when 50% visible
+            threshold: 0.5
         };
 
         const observerCallback = (entries) => {
@@ -57,8 +56,7 @@ const Home = ({ setShowLogin }) => {
     return (
         <div>
             <Header />
-            <ExploreMenu category={category} setCategory={setCategory} />
-            <FoodDisplay category={category} setShowLogin={setShowLogin} />
+            <RestaurantDisplay />
             <AboutUs />
         </div>
     )

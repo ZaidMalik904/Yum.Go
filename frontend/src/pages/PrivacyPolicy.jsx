@@ -42,7 +42,7 @@ const PrivacyPolicy = () => {
     ];
 
     return (
-        <div className='privacy-policy-container bg-white min-h-screen pb-20'>
+        <div className='privacy-policy privacy-policy-container bg-white min-h-screen pb-20'>
             {/* Hero Section */}
             <div className='relative h-[350px] bg-[#323232] flex items-center justify-center overflow-hidden'>
                 <div className='absolute inset-0 opacity-20 bg-[url("/header_img.png")] bg-cover bg-center grayscale'></div>

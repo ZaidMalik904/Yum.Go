@@ -5,7 +5,8 @@ const foodSchema = new mongoose.Schema({
     description: { type: String, required: true },
     price: { type: Number, required: true },
     image: { type: String, required: true },
-    category: { type: String, required: true }
+    category: { type: String, default: 'General' },
+    restaurantId: { type: mongoose.Schema.Types.ObjectId, ref: 'restaurant', required: true }
 })
 
 const foodModel = mongoose.models.food || mongoose.model("Food", foodSchema);

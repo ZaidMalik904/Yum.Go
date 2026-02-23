@@ -6,8 +6,12 @@ export const StoreContext = createContext(null);
 const StoreContextProvider = (props) => {
     const [token, setToken] = useState("");
     const [food_list, setFoodList] = useState([]);
+    const [restaurant_list, setRestaurantList] = useState([]);
     const [cartItems, setCartItems] = useState({});
     const [menu, setMenu] = useState("home");
+    const [selectedRestaurant, setSelectedRestaurant] = useState("All");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [discount, setDiscount] = useState(0);
 
     const url = "http://localhost:4000";
 
@@ -52,12 +56,28 @@ const StoreContextProvider = (props) => {
                 }
             }
         }
-        return totalAmount;
+        return totalAmount - discount;
+    };
+
+    const applyPromoCode = (code) => {
+        if (code === "SAVE20") {
+            setDiscount(20);
+            return true;
+        } else if (code === "SAVE50") {
+            setDiscount(50);
+            return true;
+        }
+        return false;
     };
 
     const fetchFoodList = async () => {
         const response = await axios.get(url + "/api/food/list");
         setFoodList(response.data.foods);
+    };
+
+    const fetchRestaurantList = async () => {
+        const response = await axios.get(url + "/api/restaurant/list");
+        setRestaurantList(response.data.data);
     };
 
     const loadCartData = async (token) => {
@@ -68,6 +88,7 @@ const StoreContextProvider = (props) => {
     useEffect(() => {
         async function loadData() {
             await fetchFoodList();
+            await fetchRestaurantList();
             if (localStorage.getItem("token")) {
                 setToken(localStorage.getItem("token"));
             }
@@ -121,7 +142,15 @@ const StoreContextProvider = (props) => {
         token,
         setToken,
         menu,
-        setMenu
+        setMenu,
+        restaurant_list,
+        selectedRestaurant,
+        setSelectedRestaurant,
+        searchQuery,
+        setSearchQuery,
+        discount,
+        setDiscount,
+        applyPromoCode
     };
 
     return (
