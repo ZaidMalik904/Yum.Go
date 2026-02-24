@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import './App.css'
 import Navbar from './components/Navbar/Navbar'
 import Sidebar from './components/Sidebar/Sidebar'
 import { Route, Routes, Navigate } from 'react-router-dom'
@@ -41,7 +40,7 @@ const App = () => {
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+    <div className="min-h-screen bg-slate-50">
 
       <ToastContainer
         position="top-right"
@@ -54,7 +53,7 @@ const App = () => {
         pauseOnHover
         theme="light"
         toastStyle={{
-          borderRadius: 20,
+          borderRadius: "20px",
           boxShadow: '0 20px 40px rgba(0,0,0,0.12)',
           fontFamily: "'Outfit', sans-serif",
           fontWeight: 700,
@@ -64,10 +63,10 @@ const App = () => {
 
       <Navbar url={url} adminData={adminData} setToken={setToken} setAdminData={setAdminData} />
 
-      <div className="app-content-wrapper">
+      <div className="flex w-full">
         <Sidebar />
-        <main className="admin-main">
-          <div style={{ maxWidth: 1400, margin: '0 auto' }}>
+        <main className="flex-1 min-w-0 min-h-[calc(100vh-70px)] bg-slate-50 p-8 sm:p-5 animate-fadeIn overflow-x-hidden">
+          <div className="max-w-[1400px] mx-auto">
             <Routes>
               <Route path="/" element={<Navigate to="/dashboard" />} />
               <Route path="/dashboard" element={<Dashboard url={url} />} />

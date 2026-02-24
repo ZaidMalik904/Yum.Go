@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
-import { User, Mail, Camera, Save, Loader2, Shield } from 'lucide-react'
-import { assets } from '../../assets/assets'
+import { User, Mail, Camera, Save, Loader2, Shield, Phone, CheckCircle2 } from 'lucide-react'
 
 const Profile = ({ url, token, adminData, setAdminData }) => {
     const [image, setImage] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [saved, setSaved] = useState(false)
     const [data, setData] = useState({
-        name: adminData?.name || "",
-        email: adminData?.email || "",
-        phone: adminData?.phone || ""
+        name: adminData?.name || '',
+        email: adminData?.email || '',
+        phone: adminData?.phone || ''
     })
 
     useEffect(() => {
@@ -18,154 +18,186 @@ const Profile = ({ url, token, adminData, setAdminData }) => {
             setData({
                 name: adminData.name,
                 email: adminData.email,
-                phone: adminData.phone || ""
+                phone: adminData.phone || ''
             })
         }
     }, [adminData])
 
     const onChangeHandler = (event) => {
-        const name = event.target.name;
-        const value = event.target.value;
-        setData(data => ({ ...data, [name]: value }))
+        const { name, value } = event.target
+        setData(prev => ({ ...prev, [name]: value }))
     }
 
     const onUpdate = async (event) => {
         event.preventDefault()
         setLoading(true)
         const formData = new FormData()
-        formData.append("name", data.name)
-        formData.append("email", data.email)
-        formData.append("phone", data.phone)
-        if (image) {
-            formData.append("image", image)
-        }
+        formData.append('name', data.name)
+        formData.append('email', data.email)
+        formData.append('phone', data.phone)
+        if (image) formData.append('image', image)
 
         try {
             const response = await axios.post(`${url}/api/user/update-profile`, formData, { headers: { token } })
             if (response.data.success) {
                 const updatedUser = response.data.user
                 setAdminData(updatedUser)
-                localStorage.setItem("adminData", JSON.stringify(updatedUser))
-                toast.success("Profile updated successfully")
+                localStorage.setItem('adminData', JSON.stringify(updatedUser))
+                toast.success('Profile updated successfully')
+                setSaved(true)
+                setTimeout(() => setSaved(false), 2500)
+                setImage(false)
             } else {
                 toast.error(response.data.message)
             }
-        } catch (error) {
-            toast.error("Error updating profile")
+        } catch {
+            toast.error('Error updating profile')
         } finally {
             setLoading(false)
         }
     }
 
+    const initials = (adminData?.name || 'A').charAt(0).toUpperCase()
+
     return (
-        <div className="page-container" style={{ maxWidth: 700, margin: '0 auto' }}>
-            {/* Page Header */}
-            <div className="page-header">
+        <div className="p-4 md:p-8 max-w-3xl mx-auto animate-fadeIn">
+
+            {/* ── Page Header ── */}
+            <div className="flex items-center gap-4 mb-10">
                 <div className="page-header-icon">
                     <User size={26} />
                 </div>
                 <div>
-                    <h1>Admin Profile</h1>
-                    <p>Manage your personal information and profile picture.</p>
+                    <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-none">Admin Profile</h1>
+                    <p className="text-[13px] text-slate-400 font-semibold mt-1">Manage your personal information and profile picture.</p>
                 </div>
             </div>
 
-            <div className={`card shadow-premium ${window.innerWidth < 450 ? 'mobile-card-padding' : ''}`}>
-                <form onSubmit={onUpdate} style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+            <form onSubmit={onUpdate} className="flex flex-col gap-6">
 
-                    {/* Profile Picture Section */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-                        <div style={{ position: 'relative' }}>
-                            <div style={{
-                                width: 130, height: 130, borderRadius: '50%', border: '4px solid #fff',
-                                boxShadow: '0 10px 30px rgba(0,0,0,0.12)', overflow: 'hidden', background: '#f8fafc'
-                            }}>
-                                {image ? (
-                                    <img src={URL.createObjectURL(image)} alt="profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                ) : adminData?.image ? (
-                                    <img src={`${url}/images/${adminData.image}`} alt="profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                ) : (
-                                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f1f5f9' }}>
-                                        <User size={60} style={{ color: '#cbd5e1' }} />
-                                    </div>
-                                )}
-                            </div>
-                            <label htmlFor="profile-image" style={{
-                                position: 'absolute', bottom: 5, right: 5,
-                                width: 38, height: 38, background: '#ff6347', borderRadius: '50%',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                cursor: 'pointer', border: '3.5px solid #fff', color: '#fff', boxShadow: '0 6px 14px rgba(0,0,0,0.15)',
-                                transition: 'all 0.2s'
-                            }}>
-                                <Camera size={18} />
-                            </label>
-                            <input type="file" id="profile-image" hidden onChange={e => setImage(e.target.files[0])} />
+                {/* ── Avatar Card ── */}
+                <div className="bg-white rounded-[32px] border border-slate-100 shadow-premium p-8 flex flex-col sm:flex-row items-center gap-8">
+                    {/* Avatar */}
+                    <div className="relative shrink-0">
+                        <div className="w-32 h-32 rounded-[28px] overflow-hidden border-4 border-white shadow-xl ring-2 ring-slate-100 bg-slate-50">
+                            {image ? (
+                                <img src={URL.createObjectURL(image)} alt="preview" className="w-full h-full object-cover" />
+                            ) : adminData?.image ? (
+                                <img src={`${url}/images/${adminData.image}`} alt="profile" className="w-full h-full object-cover" />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-primary-light">
+                                    <span className="text-5xl font-black text-primary leading-none">{initials}</span>
+                                </div>
+                            )}
                         </div>
-                        <div style={{ textAlign: 'center' }}>
-                            <h2 style={{ fontSize: 20, fontWeight: 900, color: '#0f172a' }}>{adminData?.name}</h2>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4 }}>
-                                <Shield size={14} style={{ color: '#ff6347' }} />
-                                <span style={{ fontSize: 10, fontWeight: 800, color: '#94a3b8', letterSpacing: 2, textTransform: 'uppercase' }}>
-                                    {adminData?.role || "Super Admin"}
-                                </span>
-                            </div>
-                        </div>
+                        {/* Camera Button */}
+                        <label
+                            htmlFor="profile-image"
+                            className="absolute -bottom-2 -right-2 w-11 h-11 rounded-2xl flex items-center justify-center cursor-pointer border-4 border-white text-white shadow-lg hover:scale-110 active:scale-95 transition-all duration-200"
+                            style={{
+                                background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
+                                boxShadow: '0 6px 20px rgba(168, 85, 247, 0.45)'
+                            }}
+                        >
+                            <Camera size={16} />
+                        </label>
+                        <input type="file" id="profile-image" hidden accept="image/*" onChange={e => setImage(e.target.files[0])} />
                     </div>
 
-                    {/* Form Fields */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 24 }}>
-                        <div>
-                            <p style={{ fontSize: 11, fontWeight: 800, color: '#94a3b8', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 12 }}>Full Name</p>
-                            <div style={{ position: 'relative' }}>
-                                <User size={18} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#cbd5e1' }} />
-                                <input
-                                    name="name" value={data.name} onChange={onChangeHandler} required
-                                    className="admin-input"
-                                    style={{ paddingLeft: 48 }}
-                                />
+                    {/* Info */}
+                    <div className="flex flex-col gap-1 text-center sm:text-left">
+                        <h2 className="text-2xl font-black text-slate-900 leading-none">{adminData?.name || 'Admin'}</h2>
+                        <p className="text-sm font-semibold text-slate-400">{adminData?.email}</p>
+                        <div className="flex items-center justify-center sm:justify-start gap-1.5 mt-2">
+                            <div className="w-5 h-5 bg-primary-light rounded-lg flex items-center justify-center">
+                                <Shield size={11} className="text-primary" />
                             </div>
+                            <span className="text-[10px] font-black text-primary uppercase tracking-widest">
+                                {adminData?.role || 'Super Admin'}
+                            </span>
                         </div>
-
-                        <div>
-                            <p style={{ fontSize: 11, fontWeight: 800, color: '#94a3b8', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 12 }}>Email Address</p>
-                            <div style={{ position: 'relative' }}>
-                                <Mail size={18} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#cbd5e1' }} />
-                                <input
-                                    name="email" value={data.email} onChange={onChangeHandler} type="email" required
-                                    className="admin-input"
-                                    style={{ paddingLeft: 48 }}
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <p style={{ fontSize: 11, fontWeight: 800, color: '#94a3b8', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 12 }}>Phone Number</p>
-                            <div style={{ position: 'relative' }}>
-                                <Shield size={18} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#cbd5e1' }} />
-                                <input
-                                    name="phone" value={data.phone} onChange={onChangeHandler} placeholder="Enter your mobile number"
-                                    className="admin-input"
-                                    style={{ paddingLeft: 48 }}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="btn-primary"
-                        style={{ padding: 16, justifyContent: 'center', width: '100%', marginTop: 8 }}
-                    >
-                        {loading ? <Loader2 className='animate-spin' size={20} /> : (
-                            <>
-                                <Save size={18} />
-                                Save Changes
-                            </>
+                        {image && (
+                            <p className="text-[11px] font-bold text-amber-500 mt-2 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-100">
+                                📷 New photo selected — save to apply
+                            </p>
                         )}
-                    </button>
-                </form>
-            </div>
+                    </div>
+                </div>
+
+                {/* ── Form Fields Card ── */}
+                <div className="bg-white rounded-[32px] border border-slate-100 shadow-premium p-8 flex flex-col gap-6">
+                    <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Personal Information</h3>
+
+                    {/* Full Name */}
+                    <div className="flex flex-col gap-2">
+                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Full Name</label>
+                        <div className="relative">
+                            <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" />
+                            <input
+                                name="name"
+                                value={data.name}
+                                onChange={onChangeHandler}
+                                required
+                                placeholder="Your full name"
+                                className="admin-input"
+                                style={{ paddingLeft: '2.75rem' }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Email */}
+                    <div className="flex flex-col gap-2">
+                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Email Address</label>
+                        <div className="relative">
+                            <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" />
+                            <input
+                                name="email"
+                                value={data.email}
+                                onChange={onChangeHandler}
+                                type="email"
+                                required
+                                placeholder="admin@yumgo.com"
+                                className="admin-input"
+                                style={{ paddingLeft: '2.75rem' }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Phone */}
+                    <div className="flex flex-col gap-2">
+                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Phone Number</label>
+                        <div className="relative">
+                            <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" />
+                            <input
+                                name="phone"
+                                value={data.phone}
+                                onChange={onChangeHandler}
+                                placeholder="+91 00000 00000"
+                                className="admin-input"
+                                style={{ paddingLeft: '2.75rem' }}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* ── Save Button ── */}
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className={`w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all duration-300 shadow-lg active:scale-95 ${saved
+                        ? 'bg-green-500 text-white shadow-green-200'
+                        : 'bg-primary text-white hover:bg-primary/90 shadow-primary/20'
+                        }`}
+                >
+                    {loading ? (
+                        <Loader2 className="animate-spin" size={20} />
+                    ) : saved ? (
+                        <><CheckCircle2 size={20} /> Saved Successfully</>
+                    ) : (
+                        <><Save size={18} /> Save Changes</>
+                    )}
+                </button>
+            </form>
         </div>
     )
 }

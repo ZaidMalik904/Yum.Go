@@ -26,6 +26,7 @@ const createTicket = async (req, res) => {
         });
 
         await newTicket.save();
+
         console.log(`[${timestamp}] [BACKEND] Ticket Created: ${newTicket._id}`);
         res.json({ success: true, message: "Ticket Created Successfully" });
     } catch (error) {

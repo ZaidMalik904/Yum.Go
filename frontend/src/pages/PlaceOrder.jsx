@@ -64,7 +64,7 @@ const PlaceOrder = () => {
         else if (getTotalCartAmount() === 0) {
             navigate('/cart');
         }
-    }, [token])
+    }, [token, getTotalCartAmount, navigate])
 
     return (
         <div className='checkout-logistics py-16 md:py-24 px-[5vw] bg-[#fcfdfd] min-h-screen'>

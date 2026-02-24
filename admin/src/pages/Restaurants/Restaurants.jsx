@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { Store, CheckCircle, XCircle, MapPin, Phone, Mail, Search, Filter, Trash2, Building2 } from 'lucide-react'
@@ -10,7 +10,7 @@ const Restaurants = ({ url }) => {
     const [filterType, setFilterType] = useState("All") // All, Approved, Pending
     const [showFilter, setShowFilter] = useState(false)
 
-    const fetchRestaurants = async () => {
+    const fetchRestaurants = useCallback(async () => {
         try {
             setLoading(true)
             const res = await axios.get(`${url}/api/restaurant/list`)
@@ -24,7 +24,7 @@ const Restaurants = ({ url }) => {
         } finally {
             setLoading(false)
         }
-    }
+    }, [url])
 
     const updateStatus = async (id, isApproved) => {
         try {
@@ -57,7 +57,7 @@ const Restaurants = ({ url }) => {
 
     useEffect(() => {
         fetchRestaurants()
-    }, [])
+    }, [fetchRestaurants])
 
     const filteredData = restaurants.filter(item => {
         const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -69,50 +69,55 @@ const Restaurants = ({ url }) => {
     })
 
     return (
-        <div className="page-container">
+        <div className="p-4 md:p-8 max-w-[1600px] mx-auto animate-fadeIn">
 
             {/* ── Page Header ── */}
-            <div className="page-header" style={{ justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10">
+                <div className="flex items-center gap-4">
                     <div className="page-header-icon">
-                        <Building2 size={26} style={{ color: '#fff' }} />
+                        <Building2 size={26} />
                     </div>
                     <div>
-                        <h1>Vendor Management</h1>
-                        <p>Review, approve, and manage partner restaurants.</p>
+                        <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-none">Vendor Management</h1>
+                        <p className="text-[13px] text-slate-400 font-semibold mt-1">Review, approve, and manage partner restaurants.</p>
                     </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: 12, alignItems: 'center', width: '100%', maxWidth: 450, flexWrap: 'wrap' }}>
-                    {/* Search Area */}
-                    <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
-                        <Search size={16} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                {/* Search + Filter Row */}
+                <div className="flex gap-3 w-full lg:max-w-lg">
+                    {/* Search Input */}
+                    <div className="relative flex-1">
+                        <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                         <input
                             placeholder="Search vendor..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="admin-input"
-                            style={{ paddingLeft: 42 }}
+                            style={{ paddingLeft: '2.75rem' }}
                         />
                     </div>
 
-                    <div style={{ position: 'relative' }}>
+                    {/* Filter Button */}
+                    <div className="relative shrink-0">
                         <button
                             onClick={() => setShowFilter(!showFilter)}
-                            className="admin-input"
-                            style={{ display: 'flex', alignItems: 'center', gap: 10, background: filterType !== 'All' ? '#fff0ed' : '#f8fafc', borderColor: filterType !== 'All' ? '#ff6347' : '#e2e8f0', cursor: 'pointer', transition: '0.2s', width: 'auto', color: filterType !== 'All' ? '#ff6347' : '#64748b' }}
+                            className={`h-full flex items-center gap-2 px-5 rounded-2xl border-2 font-black text-xs uppercase tracking-widest transition-all duration-200 cursor-pointer whitespace-nowrap ${filterType !== 'All'
+                                ? 'border-primary bg-primary-light text-primary'
+                                : 'border-slate-200 bg-white text-slate-500 hover:border-primary/30'
+                                }`}
                         >
-                            <Filter size={18} color={filterType !== 'All' ? '#ff6347' : '#94a3b8'} />
-                            {filterType === 'All' ? 'Filter Status' : filterType}
+                            <Filter size={15} />
+                            <span>{filterType === 'All' ? 'Status' : filterType}</span>
                         </button>
 
                         {showFilter && (
-                            <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 10, background: '#fff', borderRadius: 20, boxShadow: '0 10px 40px rgba(0,0,0,0.1)', border: '1px solid #f1f5f9', width: 180, zIndex: 100, padding: 8 }}>
+                            <div className="absolute top-full right-0 mt-2 bg-white rounded-[20px] shadow-2xl border border-slate-100 w-48 z-50 p-2 animate-fadeInDown">
                                 {['All', 'Approved', 'Pending'].map(status => (
                                     <div
                                         key={status}
                                         onClick={() => { setFilterType(status); setShowFilter(false); }}
-                                        style={{ padding: '10px 16px', borderRadius: 12, fontSize: 13, fontWeight: 700, color: filterType === status ? '#ff6347' : '#64748b', cursor: 'pointer', background: filterType === status ? '#fff0ed' : 'transparent', transition: '0.2s' }}
+                                        className={`px-5 py-2.5 rounded-xl text-[12px] font-black cursor-pointer transition-all ${filterType === status ? 'bg-primary-light text-primary' : 'text-slate-500 hover:bg-slate-50'
+                                            }`}
                                     >
                                         {status === 'All' ? 'All Partners' : status}
                                     </div>
@@ -125,113 +130,82 @@ const Restaurants = ({ url }) => {
 
             {/* ── Content ── */}
             {loading ? (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0' }}>
+                <div className="flex justify-center py-20">
                     <div className="spinner" />
                 </div>
             ) : filteredData.length === 0 ? (
-                <div style={{ background: '#fff', borderRadius: 24, border: '1px solid #f1f5f9', padding: '80px 32px', textAlign: 'center' }}>
-                    <div style={{ fontSize: 56, marginBottom: 16 }}>🏢</div>
-                    <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>No vendors found</h2>
-                    <p style={{ fontSize: 13, color: '#94a3b8' }}>{searchTerm ? "Try adjusting your search or filters." : "Wait for vendors to register via the frontend portal."}</p>
+                <div className="bg-white rounded-3xl border border-slate-100 py-20 px-8 text-center shadow-premium">
+                    <div className="text-6xl mb-4">🏢</div>
+                    <h2 className="text-lg font-black text-slate-900 mb-2">No vendors found</h2>
+                    <p className="text-[13px] text-slate-400 font-semibold">{searchTerm ? "Try adjusting your search or filters." : "Wait for vendors to register via the frontend portal."}</p>
                 </div>
             ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 24 }}>
-                    {filteredData.map(item => (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredData.map((item, i) => (
                         <div
                             key={item._id}
-                            style={{
-                                background: '#fff', borderRadius: 28, border: '1px solid #f1f5f9', overflow: 'hidden',
-                                boxShadow: '0 4px 20px rgba(0,0,0,0.04)', transition: 'all 0.3s',
-                                display: 'flex', flexDirection: 'column'
-                            }}
-                            onMouseEnter={e => e.currentTarget.style.boxShadow = '0 12px 36px rgba(0,0,0,0.08)'}
-                            onMouseLeave={e => e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.04)'}
+                            className="bg-white rounded-[32px] border border-slate-100 overflow-hidden shadow-card transition-all duration-300 flex flex-col hover:shadow-premium hover:-translate-y-1 group animate-fadeIn"
+                            style={{ animationDelay: `${i * 0.05}s` }}
                         >
                             {/* Cover Image Area */}
-                            <div style={{ height: 180, position: 'relative', overflow: 'hidden' }}>
+                            <div className="h-48 relative overflow-hidden">
                                 <img
                                     src={`${url}/images/${item.image}`} alt={item.name}
-                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                 />
-                                <div style={{
-                                    position: 'absolute', top: 16, right: 16,
-                                    background: item.isApproved ? '#dcfce7' : '#fef9c3',
-                                    color: item.isApproved ? '#16a34a' : '#ca8a04',
-                                    padding: '6px 14px', borderRadius: 20,
-                                    fontSize: 10, fontWeight: 800, letterSpacing: 1, textTransform: 'uppercase',
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                    backdropFilter: 'blur(4px)'
-                                }}>
+                                <div className={`absolute top-4 right-4 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg backdrop-blur-md border ${item.isApproved
+                                    ? 'bg-green-500/10 text-green-500 border-green-500/20'
+                                    : 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                                    }`}>
                                     {item.isApproved ? '✓ Verified' : '⏳ Action Required'}
                                 </div>
                             </div>
 
                             {/* Card Body */}
-                            <div style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                                <h2 style={{ fontSize: 19, fontWeight: 900, color: '#0f172a', marginBottom: 18 }}>{item.name}</h2>
+                            <div className="p-7 flex-1 flex flex-col">
+                                <h2 className="text-xl font-black text-slate-900 mb-5 leading-tight">{item.name}</h2>
 
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
+                                <div className="flex flex-col gap-3.5 mb-8">
                                     {[
-                                        { icon: Mail, val: item.email, label: 'Email' },
-                                        { icon: Phone, val: item.phone, label: 'Phone' },
-                                        { icon: MapPin, val: item.address, label: 'Location' },
-                                    ].map(({ icon: Icon, val, label }, i) => (
-                                        <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                                            <div style={{ width: 30, height: 30, background: '#f8fafc', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                                <Icon size={14} style={{ color: '#ff6347' }} />
+                                        { icon: Mail, val: item.email },
+                                        { icon: Phone, val: item.phone },
+                                        { icon: MapPin, val: item.address },
+                                    ].map(({ icon: Icon, val }, i) => (
+                                        <div key={i} className="flex items-start gap-4">
+                                            <div className="w-8 h-8 bg-slate-50 rounded-xl flex items-center justify-center shrink-0 border border-slate-100">
+                                                <Icon size={14} className="text-primary" />
                                             </div>
-                                            <div style={{ minWidth: 0 }}>
-                                                <p style={{ fontSize: 13, color: '#1e293b', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{val}</p>
+                                            <div className="min-w-0 pt-1">
+                                                <p className="text-[13px] text-slate-600 font-black overflow-hidden text-overflow-ellipsis whitespace-nowrap">{val}</p>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
 
                                 {/* Footer Actions */}
-                                <div style={{ marginTop: 'auto', display: 'flex', gap: 10 }}>
+                                <div className="mt-auto flex gap-3">
                                     {!item.isApproved ? (
                                         <button
                                             onClick={() => updateStatus(item._id, true)}
-                                            style={{
-                                                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                                                padding: '12px', borderRadius: 16, border: 'none',
-                                                fontSize: 13, fontWeight: 800, cursor: 'pointer',
-                                                background: '#22c55e', color: '#fff',
-                                                boxShadow: '0 6px 16px rgba(34,197,94,0.3)',
-                                                fontFamily: 'inherit', transition: 'all 0.2s'
-                                            }}
-                                            onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-                                            onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+                                            className="flex-1 bg-green-500 text-white flex items-center justify-center gap-2.5 px-4 py-3.5 rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all duration-300 hover:bg-green-600 shadow-lg shadow-green-500/20 active:scale-95 cursor-pointer"
                                         >
-                                            <CheckCircle size={18} />
-                                            Approve Partner
+                                            <CheckCircle size={16} />
+                                            <span>Approve Partner</span>
                                         </button>
                                     ) : (
                                         <button
                                             onClick={() => updateStatus(item._id, false)}
-                                            style={{
-                                                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                                                padding: '12px', borderRadius: 16, border: '1.5px solid #e2e8f0',
-                                                fontSize: 13, fontWeight: 800, cursor: 'pointer',
-                                                background: '#fff', color: '#64748b',
-                                                fontFamily: 'inherit', transition: 'all 0.2s'
-                                            }}
+                                            className="flex-1 border-2 border-slate-100 bg-white text-slate-400 flex items-center justify-center gap-2.5 px-4 py-3.5 rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all duration-300 hover:bg-slate-50 hover:text-slate-600 active:scale-95 cursor-pointer"
                                         >
-                                            <XCircle size={18} />
-                                            Suspend Account
+                                            <XCircle size={16} />
+                                            <span>Suspend Account</span>
                                         </button>
                                     )}
 
                                     <button
                                         onClick={() => removeVendor(item._id)}
-                                        style={{
-                                            width: 50, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            border: 'none', borderRadius: 16, cursor: 'pointer',
-                                            background: '#fef2f2', color: '#ef4444',
-                                            fontFamily: 'inherit', transition: 'all 0.2s'
-                                        }}
-                                        onMouseEnter={e => { e.currentTarget.style.background = '#ef4444'; e.currentTarget.style.color = '#fff' }}
-                                        onMouseLeave={e => { e.currentTarget.style.background = '#fef2f2'; e.currentTarget.style.color = '#ef4444' }}
+                                        className="w-12 h-[52px] flex items-center justify-center bg-red-50 text-red-500 rounded-2xl transition-all duration-300 hover:bg-red-500 hover:text-white active:scale-90 cursor-pointer"
+                                        title="Remove Vendor"
                                     >
                                         <Trash2 size={20} />
                                     </button>

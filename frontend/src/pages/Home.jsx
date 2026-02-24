@@ -1,12 +1,11 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useEffect, useContext } from 'react'
 import Header from '../components/Header'
 import RestaurantDisplay from '../components/RestaurantDisplay/RestaurantDisplay'
 import AboutUs from '../components/AboutUs'
 import { StoreContext } from '../context/StoreContext'
 
-const Home = ({ setShowLogin }) => {
+const Home = () => {
 
-    const [category, setCategory] = useState("All");
     const { setMenu } = useContext(StoreContext);
 
     useEffect(() => {

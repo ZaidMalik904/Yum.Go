@@ -1,25 +1,18 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useMemo, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { StoreContext } from '../context/StoreContext'
 import FoodItem from '../components/FoodItem'
-import { assets } from '../assets/assets'
 import { MapPin, Phone, Mail, ChevronLeft } from 'lucide-react'
 
 const Restaurant = ({ setShowLogin }) => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { restaurant_list, food_list, url, searchQuery } = useContext(StoreContext);
-    const [restaurant, setRestaurant] = useState(null);
     const [category, setCategory] = useState("All");
     const [expanded, setExpanded] = useState(false);
 
-    useEffect(() => {
-        if (restaurant_list.length > 0) {
-            const found = restaurant_list.find(r => r._id === id);
-            if (found) {
-                setRestaurant(found);
-            }
-        }
+    const restaurant = useMemo(() => {
+        return restaurant_list.find(r => r._id === id) || null;
     }, [id, restaurant_list]);
 
     if (!restaurant) {

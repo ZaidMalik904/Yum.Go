@@ -5,7 +5,7 @@ import { ShoppingCart, LogOut, User, Menu, X, ChevronDown, Search } from 'lucide
 import { assets } from '../assets/assets';
 
 const Navbar = ({ setShowLogin }) => {
-    const { getTotalCartAmount, token, setToken, menu, setMenu, cartItems, setSearchQuery } = useContext(StoreContext);
+    const { token, setToken, menu, setMenu, cartItems, setSearchQuery } = useContext(StoreContext);
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [navSearch, setNavSearch] = useState("");
@@ -13,6 +13,20 @@ const Navbar = ({ setShowLogin }) => {
     const handleSearch = (e) => {
         setNavSearch(e.target.value);
         setSearchQuery(e.target.value);
+    }
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            const display = document.getElementById('restaurant-display');
+            if (display) {
+                display.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                navigate('/');
+                setTimeout(() => {
+                    document.getElementById('restaurant-display')?.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+            }
+        }
     }
 
     const logout = () => {
@@ -29,26 +43,17 @@ const Navbar = ({ setShowLogin }) => {
 
                 {/* --- Logo Area --- */}
                 <Link to='/'
-                    style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}
+                    className='flex items-center gap-2 no-underline group'
                     onClick={() => setMenu("home")}
                 >
-                    <div
-                        style={{
-                            width: 38, height: 38,
-                            background: 'linear-gradient(135deg, #ff6347 0%, #ff4500 100%)',
-                            borderRadius: 12,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            boxShadow: '0 8px 20px rgba(255,99,71,0.3)',
-                            flexShrink: 0,
-                        }}
-                    >
-                        <img src={assets.logo} alt="logo" style={{ width: 22, height: 22, objectFit: 'contain', border: 0, display: 'block' }} />
+                    <div className="w-[38px] h-[38px] bg-gradient-to-br from-[#ff6347] to-[#ff4500] rounded-xl flex items-center justify-center shadow-[0_8px_20px_rgba(255,99,71,0.3)] shrink-0 transition-transform group-hover:scale-105">
+                        <img src={assets.logo} alt="logo" className="w-[22px] h-[22px] object-contain block border-0" />
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
-                        <span style={{ fontSize: 18, fontWeight: 900, color: '#0f172a', letterSpacing: '-0.8px' }}>
-                            YumGo<span style={{ color: '#ff6347' }}>.</span>
+                    <div className="flex flex-col leading-[1.1]">
+                        <span className="text-lg font-black text-slate-900 tracking-[-0.8px]">
+                            YumGo<span className="text-primary">.</span>
                         </span>
-                        <span style={{ fontSize: 8, fontWeight: 800, color: '#94a3b8', letterSpacing: 1.5, textTransform: 'uppercase' }}>
+                        <span className="text-[8px] font-extrabold text-slate-400 tracking-[1.5px] uppercase">
                             Marketplace
                         </span>
                     </div>
@@ -85,6 +90,7 @@ const Navbar = ({ setShowLogin }) => {
                         type="text"
                         value={navSearch}
                         onChange={handleSearch}
+                        onKeyDown={handleKeyDown}
                         placeholder="Search dishes or cuisines..."
                         className="w-full bg-slate-50 border-none rounded-2xl py-3 pl-12 pr-4 text-sm font-semibold text-slate-600 focus:ring-2 focus:ring-[tomato]/20 outline-none transition-all placeholder:text-slate-400"
                     />

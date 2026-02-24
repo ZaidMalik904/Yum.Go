@@ -1,9 +1,8 @@
 import React from 'react'
-import './Sidebar.css'
 import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, Package, PlusCircle, ListOrdered,
-  Store, Users, Settings, LifeBuoy, User
+  Store, Users, Settings, LifeBuoy, User, ChevronRight
 } from 'lucide-react'
 
 const NAV_LINKS = [
@@ -17,47 +16,128 @@ const NAV_LINKS = [
 ]
 
 const BOTTOM_LINKS = [
-  { to: '/profile', label: 'My Profile', icon: User },
-  { to: '/settings', label: 'Settings', icon: Settings },
-  { to: '/support', label: 'Help Center', icon: LifeBuoy },
+  {
+    to: '/profile',
+    label: 'My Profile',
+    icon: User,
+    desc: 'Account settings',
+    iconBg: 'bg-violet-50',
+    iconColor: 'text-violet-500',
+    activeBg: 'bg-violet-50',
+    activeBorder: 'border-violet-200',
+    activeText: 'text-violet-700',
+  },
+  {
+    to: '/settings',
+    label: 'Settings',
+    icon: Settings,
+    desc: 'App configuration',
+    iconBg: 'bg-slate-100',
+    iconColor: 'text-slate-500',
+    activeBg: 'bg-slate-900',
+    activeBorder: 'border-slate-900',
+    activeText: 'text-white',
+  },
+  {
+    to: '/support',
+    label: 'Help Center',
+    icon: LifeBuoy,
+    desc: 'Support tickets',
+    iconBg: 'bg-sky-50',
+    iconColor: 'text-sky-500',
+    activeBg: 'bg-sky-50',
+    activeBorder: 'border-sky-200',
+    activeText: 'text-sky-700',
+  },
 ]
 
 const Sidebar = () => {
   return (
-    <aside className='sidebar'>
-      <div className='sidebar-options'>
+    <aside className="w-[280px] min-h-screen bg-white border-r border-slate-100 hidden lg:flex flex-col sticky top-[70px] h-[calc(100vh-70px)] z-40 transition-all duration-300">
+      <div className="flex-1 py-8 px-6 flex flex-col gap-1.5 overflow-y-auto custom-scrollbar">
+
+        <div className="mb-4 px-4">
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[2px]">Main Navigation</p>
+        </div>
+
         {NAV_LINKS.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}
-            className={({ isActive }) =>
-              `sidebar-option ${isActive ? 'active' : ''}`
-            }
+            className={({ isActive }) => `
+              flex items-center gap-3.5 px-4 py-3.5 rounded-2xl font-bold text-[14px] transition-all duration-300 group
+              ${isActive
+                ? 'bg-primary/10 text-primary shadow-sm'
+                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}
+            `}
           >
-            <div className='indicator'></div>
-            <div className='icon-wrap'>
-              <Icon />
+            <div className="p-2 rounded-xl transition-all duration-300 group-[.active]:bg-white group-[.active]:shadow-sm group-[.active]:text-primary">
+              <Icon size={20} strokeWidth={2.5} />
             </div>
-            <p>{label}</p>
+            <span className="tracking-tight">{label}</span>
+            <div className="ml-auto opacity-0 group-[.active]:opacity-100 transition-opacity">
+              <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_10px_rgba(255,99,71,0.5)]"></div>
+            </div>
           </NavLink>
         ))}
 
-        <hr className='sidebar-separator' />
+        {/* ── Divider ── */}
+        <div className="my-6 px-1">
+          <div className="h-[1px] bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+        </div>
 
-        <div className='sidebar-bottom'>
-          {BOTTOM_LINKS.map(({ to, label, icon: Icon }) => (
+        {/* ── Systems & Support Label ── */}
+        <div className="px-4 mb-3">
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[2px]">Systems & Support</p>
+        </div>
+
+        {/* ── Bottom Links ── */}
+        <div className="flex flex-col gap-2">
+          {BOTTOM_LINKS.map(({ to, label, icon: Icon, desc, iconBg, iconColor, activeBg, activeBorder, activeText }) => (
             <NavLink
               key={to}
               to={to}
               className={({ isActive }) =>
-                `sidebar-bottom-option ${isActive ? 'active' : ''}`
+                `group flex items-center gap-3.5 px-4 py-3.5 rounded-2xl border-2 transition-all duration-300 ${isActive
+                  ? `${activeBg} ${activeBorder} ${activeText} shadow-md`
+                  : 'border-transparent hover:border-slate-100 hover:bg-slate-50 text-slate-500 hover:text-slate-900'
+                }`
               }
             >
-              <div className='indicator'></div>
-              <Icon />
-              <p>{label}</p>
+              {({ isActive }) => (
+                <>
+                  {/* Icon Box */}
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 ${isActive ? 'bg-white/60 shadow-sm' : iconBg
+                    }`}>
+                    <Icon size={17} strokeWidth={2.5} className={isActive ? activeText : iconColor} />
+                  </div>
+
+                  {/* Label + Description */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-black leading-none tracking-tight">{label}</p>
+                    <p className={`text-[10px] font-semibold mt-0.5 leading-none truncate transition-colors ${isActive ? 'opacity-60' : 'text-slate-400'
+                      }`}>{desc}</p>
+                  </div>
+
+                  {/* Chevron */}
+                  <ChevronRight
+                    size={14}
+                    className={`shrink-0 transition-all duration-300 ${isActive ? 'opacity-60' : 'text-slate-300 group-hover:text-slate-500 group-hover:translate-x-0.5'
+                      }`}
+                  />
+                </>
+              )}
             </NavLink>
           ))}
+        </div>
+
+      </div>
+
+      {/* Version Info */}
+      <div className="p-6 border-t border-slate-50">
+        <div className="flex items-center gap-3">
+          <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]"></div>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">v2.4.0 • Enterprise</p>
         </div>
       </div>
     </aside>

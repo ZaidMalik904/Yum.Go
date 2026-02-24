@@ -5,7 +5,7 @@ import axios from 'axios'
 
 const LoginPopup = ({ setShowLogin }) => {
 
-    const { url, setToken, token } = useContext(StoreContext)
+    const { url, setToken } = useContext(StoreContext)
 
     const [currState, setCurrState] = useState("Login")
     const [data, setData] = useState({

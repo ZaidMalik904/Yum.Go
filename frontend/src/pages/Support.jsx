@@ -30,7 +30,7 @@ const Support = () => {
         if (token && activeTab === "history") {
             fetchUserTickets();
         }
-    }, [token, activeTab]);
+    }, [token, activeTab, fetchUserTickets]);
 
     // Poll for updates if a ticket is open
     useEffect(() => {
@@ -56,9 +56,9 @@ const Support = () => {
         return () => {
             if (interval) clearInterval(interval);
         };
-    }, [activeTicket?._id, activeTicket?.responses?.length, token]);
+    }, [activeTicket, url, token]);
 
-    const fetchUserTickets = async () => {
+    const fetchUserTickets = React.useCallback(async () => {
         if (!token) return;
         setLoading(true);
         try {
@@ -66,12 +66,12 @@ const Support = () => {
             if (response.data.success) {
                 setTickets(response.data.data);
             }
-        } catch (error) {
+        } catch {
             toast.error("Error fetching tickets");
         } finally {
             setLoading(false);
         }
-    }
+    }, [url, token])
 
     const onFormChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -134,7 +134,7 @@ const Support = () => {
                 updated.responses = [...(updated.responses || []), { sender: 'user', text: msg, time: new Date() }];
                 setActiveTicket(updated);
             }
-        } catch (e) {
+        } catch {
             toast.error("Failed to send");
             setResponseMsg(msg);
         }

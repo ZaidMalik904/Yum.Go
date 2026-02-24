@@ -1,4 +1,5 @@
 import React, { useContext } from 'react'
+import axios from 'axios';
 import { StoreContext } from '../context/StoreContext'
 import { Plus, Minus, ShoppingBag, Star } from 'lucide-react'
 

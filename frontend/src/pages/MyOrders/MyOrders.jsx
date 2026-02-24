@@ -10,12 +10,10 @@ const MyOrders = () => {
     const [loading, setLoading] = useState(true);
     const [expandedOrder, setExpandedOrder] = useState(null);
 
-    const fetchOrders = async () => {
+    const fetchOrders = React.useCallback(async () => {
         try {
             setLoading(true);
-            console.log("DEBUG: Fetching orders for token:", token ? token.substring(0, 10) + "..." : "NONE");
             const response = await axios.post(url + "/api/order/userorders", {}, { headers: { token } });
-            console.log("DEBUG: Orders Response Stringified:", JSON.stringify(response.data));
             if (response.data.success) {
                 setData(response.data.data || []);
             } else {
@@ -27,13 +25,13 @@ const MyOrders = () => {
         } finally {
             setLoading(false);
         }
-    }
+    }, [url, token])
 
     useEffect(() => {
         if (token) {
             fetchOrders();
         }
-    }, [token])
+    }, [token, fetchOrders])
 
     const statusSteps = [
         { status: "Order Placed", icon: Clock, label: "Confirmed" },
@@ -128,7 +126,6 @@ const MyOrders = () => {
 
                                             {statusSteps.map((step, i) => {
                                                 const isActive = i <= currentIdx;
-                                                const isComplete = i < currentIdx;
                                                 const Icon = step.icon;
 
                                                 return (

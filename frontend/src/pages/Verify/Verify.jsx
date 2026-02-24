@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useCallback } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { StoreContext } from '../../context/StoreContext'
 import axios from 'axios';
@@ -11,7 +11,7 @@ const Verify = () => {
     const { url } = useContext(StoreContext);
     const navigate = useNavigate();
 
-    const verifyPayment = async () => {
+    const verifyPayment = useCallback(async () => {
         const response = await axios.post(url + "/api/order/verify", {
             success,
             orderId,
@@ -22,11 +22,11 @@ const Verify = () => {
         else {
             navigate("/");
         }
-    }
+    }, [url, success, orderId, navigate]);
 
     useEffect(() => {
         verifyPayment();
-    }, [])
+    }, [verifyPayment])
 
     return (
         <div className='min-h-[60vh] grid place-items-center'>

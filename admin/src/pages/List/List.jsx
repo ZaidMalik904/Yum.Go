@@ -1,18 +1,19 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
-import { Trash2, ShoppingBasket, Filter } from 'lucide-react'
+import { Trash2, ShoppingBasket, Filter, Search } from 'lucide-react'
 
 const CATEGORIES = ['All', 'Salad', 'Rolls', 'Desserts', 'Sandwich', 'Cake', 'Pure Veg', 'Pasta', 'Noodles', 'Pizza', 'Burger', 'Ice Cream', 'Drinks']
 
 const List = ({ url }) => {
   const [list, setList] = useState([])
   const [currCategory, setCurrCategory] = useState('All')
+  const [searchTerm, setSearchTerm] = useState('')
   const [loading, setLoading] = useState(true)
   const [showFilter, setShowFilter] = useState(false)
-  const [isMobileView, setIsMobileView] = useState(window.innerWidth < 640)
+  const [isMobileView, setIsMobileView] = useState(window.innerWidth < 1024)
 
-  const listFood = async () => {
+  const listFood = useCallback(async () => {
     try {
       setLoading(true)
       const res = await axios.get(`${url}/api/food/list`)
@@ -20,145 +21,171 @@ const List = ({ url }) => {
       else toast.error('Error fetching food list')
     } catch { toast.error('Error connecting to server') }
     finally { setLoading(false) }
-  }
+  }, [url])
 
   const removeFood = async (id) => {
     try {
       const res = await axios.post(`${url}/api/food/remove`, { id })
-      if (res.data.success) { toast.success(res.data.message); await listFood() }
+      if (res.data.success) {
+        toast.success(res.data.message)
+        await listFood()
+      }
       else toast.error('Error removing food')
     } catch { toast.error('Error connecting to server') }
   }
 
   useEffect(() => {
     listFood()
-    const handleResize = () => setIsMobileView(window.innerWidth < 640)
+    const handleResize = () => setIsMobileView(window.innerWidth < 1024)
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
-  }, [])
+  }, [listFood])
 
-  const filtered = list.filter(i => currCategory === 'All' || i.category === currCategory)
+  const filtered = list.filter(i => {
+    const matchesCategory = currCategory === 'All' || i.category === currCategory;
+    const matchesSearch = i.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearch;
+  })
 
   return (
-    <div className="page-container" style={{ overflow: 'hidden' }}>
+    <div className="p-4 md:p-8 max-w-[1600px] mx-auto animate-fadeIn">
 
       {/* ── Page Header ── */}
-      <div className="page-header" style={{ justifyContent: 'space-between', gap: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10">
+        <div className="flex items-center gap-4">
           <div className="page-header-icon">
             <ShoppingBasket size={26} />
           </div>
           <div>
-            <h1>Menu Catalog</h1>
-            <p>{isMobileView ? "Manage your dishes." : "Manage all dishes available across restaurants."}</p>
+            <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-none">Menu Catalog</h1>
+            <p className="text-[13px] text-slate-400 font-semibold mt-1">
+              {isMobileView ? "Manage your dishes." : "Manage all dishes available across restaurants."}
+            </p>
           </div>
         </div>
 
-        {/* Filter Dropdown */}
-        <div style={{ position: 'relative', width: isMobileView ? '100%' : 'auto' }}>
-          <button
-            onClick={() => setShowFilter(!showFilter)}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 10,
-              background: currCategory !== 'All' ? '#fff0ed' : '#fff',
-              border: currCategory !== 'All' ? '1.5px solid #ff6347' : '1.5px solid #e2e8f0',
-              borderRadius: 16, padding: isMobileView ? '10px 16px' : '12px 20px',
-              cursor: 'pointer', transition: '0.2s',
-              width: isMobileView ? '100%' : 'auto',
-              justifyContent: isMobileView ? 'center' : 'flex-start'
-            }}
-          >
-            <Filter size={isMobileView ? 16 : 18} color={currCategory !== 'All' ? '#ff6347' : '#94a3b8'} />
-            <span style={{ fontSize: isMobileView ? 12 : 13, fontWeight: 700, color: currCategory !== 'All' ? '#ff6347' : '#64748b' }}>
-              {currCategory === 'All' ? 'Filter Category' : currCategory}
-            </span>
-          </button>
+        <div className="flex gap-3 w-full lg:max-w-lg">
+          {/* Search Input */}
+          <div className="relative flex-1">
+            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+            <input
+              placeholder="Search dishes..."
+              className="admin-input"
+              style={{ paddingLeft: '2.75rem' }}
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+            />
+          </div>
 
-          {showFilter && (
-            <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 10, background: '#fff', borderRadius: 20, boxShadow: '0 10px 40px rgba(0,0,0,0.1)', border: '1px solid #f1f5f9', width: isMobileView ? '100%' : 220, zIndex: 100, padding: 8, maxHeight: 300, overflowY: 'auto' }}>
-              {CATEGORIES.map(c => (
-                <div
-                  key={c}
-                  onClick={() => { setCurrCategory(c); setShowFilter(false); }}
-                  style={{ padding: '10px 16px', borderRadius: 12, fontSize: 13, fontWeight: 700, color: currCategory === c ? '#ff6347' : '#64748b', cursor: 'pointer', background: currCategory === c ? '#fff0ed' : 'transparent', transition: '0.2s' }}
-                >
-                  {c}
+          {/* Filter Dropdown */}
+          <div className="relative shrink-0">
+            <button
+              onClick={() => setShowFilter(!showFilter)}
+              className={`h-full flex items-center gap-2 px-5 rounded-2xl border-2 font-black text-xs uppercase tracking-widest transition-all duration-200 cursor-pointer whitespace-nowrap ${currCategory !== 'All'
+                  ? 'border-primary bg-primary-light text-primary'
+                  : 'border-slate-200 bg-white text-slate-500 hover:border-primary/30'
+                }`}
+            >
+              <Filter size={15} />
+              <span>{currCategory === 'All' ? 'Category' : currCategory}</span>
+            </button>
+
+            {showFilter && (
+              <div className="absolute top-full right-0 mt-2 bg-white rounded-[24px] shadow-2xl border border-slate-100 min-w-[190px] z-50 p-2 animate-fadeInDown overflow-hidden">
+                <div className="max-h-[300px] overflow-y-auto">
+                  {CATEGORIES.map(c => (
+                    <div
+                      key={c}
+                      onClick={() => { setCurrCategory(c); setShowFilter(false); }}
+                      className={`px-5 py-2.5 rounded-xl text-[12px] font-black cursor-pointer transition-all ${currCategory === c ? 'bg-primary-light text-primary' : 'text-slate-500 hover:bg-slate-50'
+                        }`}
+                    >
+                      {c}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       {/* ── Content ── */}
       {loading ? (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '80px 0' }}>
+        <div className="flex justify-center items-center py-32">
           <div className="spinner" />
         </div>
       ) : (
-        <div className="card shadow-premium" style={{ padding: 0, overflow: 'hidden' }}>
-          <div className="table-responsive">
-            <div style={{ minWidth: isMobileView ? 600 : 750 }}>
-              {/* Table Header */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: isMobileView ? '70px 1fr 120px 80px 50px' : '80px 1fr 140px 100px 60px',
-                alignItems: 'center', padding: isMobileView ? '14px 20px' : '14px 28px',
-                background: '#f8fafc', borderBottom: '1px solid #f1f5f9', gap: isMobileView ? 12 : 16
-              }}>
-                {['Img', 'Dish Name', 'Category', 'Price', 'Act'].map(h => (
-                  <span key={h} style={{ fontSize: 10, fontWeight: 800, color: '#94a3b8', letterSpacing: 1.5, textTransform: 'uppercase', textAlign: h === 'Act' ? 'center' : 'left' }}>{h}</span>
-                ))}
-              </div>
+        <div className="bg-white rounded-[40px] shadow-premium border border-slate-100 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-slate-50/50 border-b border-slate-100">
+                  {['Preview', 'Item Identity', 'Category Tag', 'Price Point', 'Action'].map((h, i) => (
+                    <th key={i} className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-8 py-5 text-left">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="py-24 text-center">
+                      <p className="text-slate-300 font-black italic">No culinary masterpieces found in this category.</p>
+                    </td>
+                  </tr>
+                ) : (
+                  filtered.map((item, i) => (
+                    <tr key={i} className="hover:bg-slate-50/40 transition-colors group">
+                      {/* Image */}
+                      <td className="px-8 py-5">
+                        <div className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-white shadow-sm ring-1 ring-slate-100 group-hover:scale-105 transition-transform duration-300">
+                          <img
+                            src={`${url}/images/${item.image}`}
+                            alt={item.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </td>
+                      {/* Name */}
+                      <td className="px-8 py-5">
+                        <div className="flex flex-col">
+                          <span className="text-base font-black text-slate-900 leading-tight">{item.name}</span>
+                          <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest mt-1">ID: {item._id.slice(-6).toUpperCase()}</span>
+                        </div>
+                      </td>
+                      {/* Category */}
+                      <td className="px-8 py-5">
+                        <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-black uppercase tracking-widest border border-slate-200">
+                          {item.category}
+                        </span>
+                      </td>
+                      {/* Price */}
+                      <td className="px-8 py-5">
+                        <span className="text-lg font-black text-slate-900 tracking-tighter">${item.price}</span>
+                      </td>
+                      {/* Delete */}
+                      <td className="px-8 py-5">
+                        <div className="flex justify-center lg:justify-start">
+                          <button
+                            onClick={() => removeFood(item._id)}
+                            className="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center transition-all duration-300 hover:bg-red-500 hover:text-white hover:scale-110 active:scale-90 shadow-sm"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
 
-              {/* Table Rows */}
-              {filtered.length === 0 ? (
-                <div style={{ padding: '64px 28px', textAlign: 'center' }}>
-                  <p style={{ fontSize: 14, fontWeight: 700, color: '#94a3b8' }}>No items found.</p>
-                </div>
-              ) : (
-                filtered.map((item, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: isMobileView ? '70px 1fr 120px 80px 50px' : '80px 1fr 140px 100px 60px',
-                      alignItems: 'center', padding: isMobileView ? '16px 20px' : '16px 28px',
-                      borderBottom: i < filtered.length - 1 ? '1px solid #f8fafc' : 'none',
-                      gap: isMobileView ? 12 : 16, transition: '0.2s'
-                    }}
-                  >
-                    {/* Image */}
-                    <div style={{ position: 'relative', width: isMobileView ? 48 : 56, height: isMobileView ? 48 : 56 }}>
-                      <img
-                        src={`${url}/images/${item.image}`}
-                        alt={item.name}
-                        style={{ width: '100%', height: '100%', borderRadius: 14, objectFit: 'cover', boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}
-                      />
-                    </div>
-                    {/* Name */}
-                    <p style={{ fontSize: isMobileView ? 13 : 14, fontWeight: 700, color: '#0f172a' }}>{item.name}</p>
-                    {/* Category */}
-                    <div>
-                      <span style={{ display: 'inline-block', background: '#f8fafc', border: '1px solid #e2e8f0', color: '#64748b', padding: '4px 10px', borderRadius: 20, fontSize: 10, fontWeight: 700 }}>
-                        {item.category}
-                      </span>
-                    </div>
-                    {/* Price */}
-                    <p style={{ fontSize: isMobileView ? 14 : 15, fontWeight: 800, color: '#0f172a' }}>${item.price}</p>
-                    {/* Delete */}
-                    <div style={{ display: 'flex', justifyContent: 'center' }}>
-                      <button
-                        onClick={() => removeFood(item._id)}
-                        style={{ width: 34, height: 34, background: '#fef2f2', border: 'none', borderRadius: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444' }}
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
+          {/* Footer Stat */}
+          <div className="px-8 py-6 bg-slate-50/50 border-t border-slate-100">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+              Displaying <span className="text-slate-900">{filtered.length}</span> Active Menu Entities
+            </p>
           </div>
         </div>
       )}

@@ -40,7 +40,7 @@ const Login = ({ url, setToken, setAdminData }) => {
             } else {
                 toast.error(response.data.message)
             }
-        } catch (error) {
+        } catch {
             toast.error("Error connecting to server")
         } finally {
             setLoading(false)

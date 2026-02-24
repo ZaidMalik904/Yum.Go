@@ -1,10 +1,9 @@
-import { createContext, useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-
-export const StoreContext = createContext(null);
+import { StoreContext } from "./StoreContext";
 
 const StoreContextProvider = (props) => {
-    const [token, setToken] = useState("");
+    const [token, setToken] = useState(() => localStorage.getItem("token") || "");
     const [food_list, setFoodList] = useState([]);
     const [restaurant_list, setRestaurantList] = useState([]);
     const [cartItems, setCartItems] = useState({});
@@ -15,14 +14,38 @@ const StoreContextProvider = (props) => {
 
     const url = "https://yum-go.onrender.com";
 
+    // Initial Data Load
+    useEffect(() => {
+        let isMounted = true;
+
+        const loadInitialData = async () => {
+            try {
+                const [foodRes, restRes] = await Promise.all([
+                    axios.get(url + "/api/food/list"),
+                    axios.get(url + "/api/restaurant/list")
+                ]);
+
+                if (isMounted) {
+                    setFoodList(foodRes.data.foods || []);
+                    setRestaurantList(restRes.data.data || []);
+                }
+            } catch (error) {
+                console.error("Initial load error:", error);
+            }
+        };
+
+        loadInitialData();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [url]);
+
     const addToCart = async (itemId) => {
         setCartItems((prev) => {
             const currentCart = prev || {};
-            if (!currentCart[itemId]) {
-                return { ...currentCart, [itemId]: 1 };
-            } else {
-                return { ...currentCart, [itemId]: currentCart[itemId] + 1 };
-            }
+            const newCount = (currentCart[itemId] || 0) + 1;
+            return { ...currentCart, [itemId]: newCount };
         });
         if (token) {
             await axios.post(url + "/api/cart/add", { itemId }, { headers: { token } });
@@ -45,7 +68,7 @@ const StoreContextProvider = (props) => {
         }
     };
 
-    const getTotalCartAmount = () => {
+    const getTotalCartAmount = useCallback(() => {
         if (!cartItems || typeof cartItems !== "object") return 0;
         let totalAmount = 0;
         for (const item in cartItems) {
@@ -56,8 +79,8 @@ const StoreContextProvider = (props) => {
                 }
             }
         }
-        return totalAmount - discount;
-    };
+        return Math.max(0, totalAmount - discount);
+    }, [cartItems, food_list, discount]);
 
     const applyPromoCode = (code) => {
         if (code === "SAVE20") {
@@ -70,66 +93,49 @@ const StoreContextProvider = (props) => {
         return false;
     };
 
-    const fetchFoodList = async () => {
-        const response = await axios.get(url + "/api/food/list");
-        setFoodList(response.data.foods);
-    };
-
-    const fetchRestaurantList = async () => {
-        const response = await axios.get(url + "/api/restaurant/list");
-        setRestaurantList(response.data.data);
-    };
-
-    const loadCartData = async (token) => {
-        const response = await axios.post(url + "/api/cart/get", {}, { headers: { token } });
-        setCartItems(response.data.cartData || {});
-    }
-
+    // Token change handling
     useEffect(() => {
-        async function loadData() {
-            await fetchFoodList();
-            await fetchRestaurantList();
-            if (localStorage.getItem("token")) {
-                setToken(localStorage.getItem("token"));
-            }
-        }
-        loadData();
-    }, []);
+        let isMounted = true;
 
-    // Load cart data whenever token changes (e.g. login/logout/startup)
-    useEffect(() => {
-        if (token) {
-            loadCartData(token);
-        }
-    }, [token]);
-
-    // Load local cart if no token (guest mode) on mount
-    useEffect(() => {
-        if (!token) {
-            const storedCart = localStorage.getItem("cartItems");
-            if (storedCart) {
+        async function syncCart() {
+            if (token) {
                 try {
-                    const parsedCart = JSON.parse(storedCart);
-                    // Ensure parsedCart is an object and not null
-                    if (parsedCart && typeof parsedCart === 'object') {
-                        setCartItems(parsedCart);
+                    const response = await axios.post(url + "/api/cart/get", {}, { headers: { token } });
+                    if (isMounted) {
+                        setCartItems(response.data.cartData || {});
                     }
                 } catch (error) {
-                    console.error("Failed to parse cart items form local storage", error);
-                    localStorage.removeItem("cartItems");
+                    console.error("Sync cart error:", error);
+                }
+            } else {
+                // Load local cart if no token (guest mode)
+                const storedCart = localStorage.getItem("cartItems");
+                if (storedCart) {
+                    try {
+                        const parsedCart = JSON.parse(storedCart);
+                        if (isMounted && parsedCart && typeof parsedCart === 'object') {
+                            setCartItems(parsedCart);
+                        }
+                    } catch {
+                        localStorage.removeItem("cartItems");
+                    }
                 }
             }
         }
-    }, [token]);
 
+        syncCart();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [token, url]);
+
+    // Persist Guest Cart
     useEffect(() => {
-        // Only update local storage if not logged in (guest cart persistence) or if switching behavior is desired. 
-        // For now, let's keep it simple: always sync cartItems to local storage so it's fresh on reload if not loading from API.
-        // But importantly, check if cartItems exists to avoid the "Cannot convert undefined or null to object" error.
-        if (cartItems && typeof cartItems === "object") {
+        if (!token && cartItems && typeof cartItems === "object") {
             localStorage.setItem("cartItems", JSON.stringify(cartItems));
         }
-    }, [cartItems]);
+    }, [cartItems, token]);
 
     const contextValue = {
         food_list,

@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import axios from 'axios'
 import {
-    Users as UsersIcon, UserPlus, Search, Filter,
-    MoreVertical, Mail, Phone, Calendar, Shield,
-    Trash2, Ban, ChevronLeft, ChevronRight, UserCheck, Edit, X, Camera, Save, Loader2
+    Users as UsersIcon, Search, Filter,
+    Mail, Phone, Calendar, Shield,
+    UserCheck, Ban, Edit, X, Camera, Save, Loader2, AlertCircle
 } from 'lucide-react'
 import { toast } from 'react-toastify'
-import { assets } from '../../assets/assets'
+
 
 const Users = ({ url, token }) => {
     const [users, setUsers] = useState([])
@@ -14,7 +14,6 @@ const Users = ({ url, token }) => {
     const [searchTerm, setSearchTerm] = useState('')
     const [filterStatus, setFilterStatus] = useState('All')
     const [showFilter, setShowFilter] = useState(false)
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 1024)
 
     // Edit Modal State
     const [showEditModal, setShowEditModal] = useState(false)
@@ -23,14 +22,7 @@ const Users = ({ url, token }) => {
     const [editImage, setEditImage] = useState(false)
     const [updateLoading, setUpdateLoading] = useState(false)
 
-    useEffect(() => {
-        const handleResize = () => setIsMobile(window.innerWidth < 1024)
-        window.addEventListener('resize', handleResize)
-        fetchUsers()
-        return () => window.removeEventListener('resize', handleResize)
-    }, [])
-
-    const fetchUsers = async () => {
+    const fetchUsers = useCallback(async () => {
         try {
             setLoading(true)
             const res = await axios.get(`${url}/api/user/list`, { headers: { token } })
@@ -39,12 +31,16 @@ const Users = ({ url, token }) => {
             } else {
                 toast.error("Error fetching users")
             }
-        } catch (error) {
+        } catch {
             toast.error("Network Error")
         } finally {
             setLoading(false)
         }
-    }
+    }, [url, token])
+
+    useEffect(() => {
+        fetchUsers()
+    }, [fetchUsers])
 
     const toggleBan = async (id, currentStatus) => {
         try {
@@ -53,7 +49,7 @@ const Users = ({ url, token }) => {
                 toast.success(currentStatus ? "User Unbanned" : "User Banned Successfully")
                 fetchUsers()
             }
-        } catch (error) {
+        } catch {
             toast.error("Failed to update user status")
         }
     }
@@ -101,148 +97,139 @@ const Users = ({ url, token }) => {
         return matchesSearch && matchesStatus;
     })
 
-    const S = {
-        th: { fontSize: 10, fontWeight: 900, color: '#94a3b8', letterSpacing: 2, textTransform: 'uppercase', padding: '18px 24px', background: '#f8fafc', textAlign: 'left', borderBottom: '1.5px solid #f1f5f9' },
-        td: { padding: '20px 24px', fontSize: 14, color: '#0f172a', fontWeight: 600, borderBottom: '1.2px solid #f8fafc' },
-        badge: (status) => ({
-            padding: '5px 12px', borderRadius: 20, fontSize: 10, fontWeight: 900,
-            background: status === 'Active' ? '#f0fdf4' : '#fef2f2',
-            color: status === 'Active' ? '#16a34a' : '#ef4444',
-            border: `1.2px solid ${status === 'Active' ? '#16a34a15' : '#ef444415'}`
-        })
-    }
-
     return (
-        <div className="page-container">
+        <div className="p-4 md:p-8 max-w-[1600px] mx-auto animate-fadeIn">
             {/* Page Header */}
-            <div className="page-header" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10">
+                <div className="flex items-center gap-4">
                     <div className="page-header-icon">
-                        <UsersIcon size={26} color="#fff" />
+                        <UsersIcon size={26} />
                     </div>
                     <div>
-                        <h1>Identity Database</h1>
-                        <p>Managing {users.length} registered global customer accounts.</p>
+                        <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-none">Identity Database</h1>
+                        <p className="text-[13px] text-slate-400 font-semibold mt-1">Managing {users.length} registered global customer accounts.</p>
                     </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: 12, position: 'relative', width: isMobile ? '100%' : 'auto', maxWidth: isMobile ? '100%' : 450, flexWrap: 'wrap', marginTop: isMobile ? 12 : 0 }}>
-                    <div style={{ position: 'relative', flex: 1, minWidth: 220 }}>
-                        <Search size={18} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                <div className="flex gap-3 w-full lg:max-w-lg">
+                    {/* Search Input */}
+                    <div className="relative flex-1">
+                        <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                         <input
                             placeholder="Find by name or email..."
                             className="admin-input"
-                            style={{ paddingLeft: 46 }}
+                            style={{ paddingLeft: '2.75rem' }}
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <button
-                        onClick={() => setShowFilter(!showFilter)}
-                        className="admin-input"
-                        style={{ width: 'auto', padding: '12px', border: filterStatus !== 'All' ? '2px solid #ff6347' : '2px solid #e2e8f0', background: filterStatus !== 'All' ? '#fff0ed' : '#fff', cursor: 'pointer', transition: '0.2s' }}
-                    >
-                        <Filter size={20} color={filterStatus !== 'All' ? '#ff6347' : '#94a3b8'} />
-                    </button>
 
-                    {showFilter && (
-                        <div className="animate-fadeInDown" style={{ position: 'absolute', top: '100%', right: 0, marginTop: 12, background: '#fff', borderRadius: 20, boxShadow: '0 15px 45px rgba(0,0,0,0.1)', border: '1px solid #f1f5f9', width: 220, zIndex: 100, padding: 10 }}>
-                            {['All', 'Active', 'Banned'].map(status => (
-                                <div
-                                    key={status}
-                                    onClick={() => { setFilterStatus(status); setShowFilter(false); }}
-                                    style={{ padding: '12px 18px', borderRadius: 14, fontSize: 13, fontWeight: 800, color: filterStatus === status ? '#ff6347' : '#64748b', cursor: 'pointer', background: filterStatus === status ? '#fff0ed' : 'transparent', transition: '0.2s' }}
-                                >
-                                    {status} Accounts
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                    {/* Filter Button */}
+                    <div className="relative shrink-0">
+                        <button
+                            onClick={() => setShowFilter(!showFilter)}
+                            className={`h-full flex items-center gap-2 px-5 rounded-2xl border-2 font-black text-xs uppercase tracking-widest transition-all duration-200 cursor-pointer whitespace-nowrap ${filterStatus !== 'All'
+                                ? 'border-primary bg-primary-light text-primary'
+                                : 'border-slate-200 bg-white text-slate-500 hover:border-primary/30'
+                                }`}
+                        >
+                            <Filter size={15} />
+                            <span>{filterStatus === 'All' ? 'Status' : filterStatus}</span>
+                        </button>
+
+                        {showFilter && (
+                            <div className="absolute top-full right-0 mt-2 bg-white rounded-[24px] shadow-2xl border border-slate-100 w-48 z-50 p-2 animate-fadeInDown">
+                                {['All', 'Active', 'Banned'].map(status => (
+                                    <div
+                                        key={status}
+                                        onClick={() => { setFilterStatus(status); setShowFilter(false); }}
+                                        className={`px-5 py-2.5 rounded-xl text-[12px] font-black cursor-pointer transition-all ${filterStatus === status ? 'bg-primary-light text-primary' : 'text-slate-500 hover:bg-slate-50'
+                                            }`}
+                                    >
+                                        {status === 'All' ? 'All Accounts' : `${status} Accounts`}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
             {/* Main Table Card */}
-            <div className="card" style={{ padding: 0 }}>
-                <div className="table-responsive">
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <div className="bg-white rounded-[40px] shadow-premium border border-slate-100 overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full border-collapse">
                         <thead>
-                            <tr>
-                                {['Customer Profile', 'Contact & Authentication', 'Join Date', 'Permissions', 'Status', ''].map(h => (
-                                    <th key={h} style={S.th}>{h}</th>
+                            <tr className="bg-slate-50/50">
+                                {['Customer Profile', 'Contact Info', 'Join Date', 'Permissions', 'Status', 'Actions'].map((h, i) => (
+                                    <th key={i} className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-8 py-5 text-left border-b border-slate-100">{h}</th>
                                 ))}
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="divide-y divide-slate-50">
                             {loading ? (
-                                <tr><td colSpan="6" style={{ padding: 60, textAlign: 'center' }}><div className="spinner" style={{ margin: '0 auto' }} /></td></tr>
+                                <tr>
+                                    <td colSpan="6" className="py-20 text-center">
+                                        <div className="spinner mx-auto" />
+                                    </td>
+                                </tr>
                             ) : filteredUsers.length === 0 ? (
-                                <tr><td colSpan="6" style={{ padding: 60, textAlign: 'center', color: '#94a3b8', fontSize: 14 }}>No customer records found.</td></tr>
+                                <tr>
+                                    <td colSpan="6" className="py-20 text-center">
+                                        <AlertCircle size={40} className="mx-auto text-slate-100 mb-4" />
+                                        <p className="text-slate-400 font-bold text-sm">No customer records found matching criteria.</p>
+                                    </td>
+                                </tr>
                             ) : filteredUsers.map((u, i) => (
-                                <tr key={i} style={{ transition: '0.2s' }} onMouseEnter={e => e.currentTarget.style.background = '#fcfcfc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                                    <td style={S.td}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                                            <div style={{ width: 44, height: 44, borderRadius: 16, background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: '1.5px solid #fff', boxShadow: '0 4px 10px rgba(0,0,0,0.03)' }}>
-                                                {u.image ? (
-                                                    <img
-                                                        src={`${url}/images/${u.image}`}
-                                                        alt=""
-                                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                                        onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' }}
-                                                    />
-                                                ) : (
-                                                    <UsersIcon size={24} style={{ color: '#94a3b8' }} />
-                                                )}
+                                <tr key={u._id || i} className="hover:bg-slate-50/30 transition-colors group">
+                                    <td className="px-8 py-5">
+                                        <div>
+                                            <p className="text-base font-black text-slate-900 leading-none">{u.name}</p>
+                                            <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mt-1.5">ID: {u._id.slice(-8).toUpperCase()}</p>
+                                        </div>
+                                    </td>
+                                    <td className="px-8 py-5">
+                                        <div className="flex flex-col gap-1.5">
+                                            <div className="flex items-center gap-2">
+                                                <Mail size={12} className="text-slate-400" />
+                                                <span className="text-xs font-bold text-slate-600">{u.email}</span>
                                             </div>
-                                            <div>
-                                                <p style={{ fontSize: 15, fontWeight: 900, color: '#0f172a' }}>{u.name}</p>
-                                                <p style={{ fontSize: 10, color: '#94a3b8', fontWeight: 800, letterSpacing: 1 }}>ID: {u._id.slice(-8).toUpperCase()}</p>
+                                            <div className="flex items-center gap-2">
+                                                <Phone size={12} className="text-slate-400" />
+                                                <span className="text-xs font-bold text-slate-600 uppercase tracking-tight">{u.phone || 'No Mobile'}</span>
                                             </div>
                                         </div>
                                     </td>
-                                    <td style={S.td}>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                                <Mail size={13} style={{ color: '#94a3b8' }} />
-                                                <span style={{ fontSize: 12, fontWeight: 700, color: '#475569' }}>{u.email}</span>
-                                            </div>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                                <Phone size={13} style={{ color: '#94a3b8' }} />
-                                                <span style={{ fontSize: 12, fontWeight: 700, color: '#475569' }}>{u.phone || 'NO MOBILE LINKED'}</span>
-                                            </div>
+                                    <td className="px-8 py-5">
+                                        <div className="flex items-center gap-2.5">
+                                            <Calendar size={14} className="text-slate-400" />
+                                            <span className="text-[13px] font-black text-slate-500">{u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-GB') : 'N/A'}</span>
                                         </div>
                                     </td>
-                                    <td style={S.td}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                            <Calendar size={15} style={{ color: '#94a3b8' }} />
-                                            <span style={{ fontSize: 13, fontWeight: 750, color: '#64748b' }}>{u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}</span>
+                                    <td className="px-8 py-5">
+                                        <div className="flex items-center gap-2.5">
+                                            <Shield size={14} className="text-primary" />
+                                            <span className="text-[11px] font-black text-slate-900 uppercase tracking-wider">{u.role || 'Consumer'}</span>
                                         </div>
                                     </td>
-                                    <td style={S.td}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                            <Shield size={16} color="#ff6347" />
-                                            <span style={{ fontSize: 13, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 0.5 }}>{u.role || 'Consumer'}</span>
-                                        </div>
+                                    <td className="px-8 py-5">
+                                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${u.isBanned ? 'bg-red-50 text-red-500 border-red-500/10' : 'bg-green-50 text-green-500 border-green-500/10'}`}>
+                                            {u.isBanned ? 'Restricted' : 'Authenticated'}
+                                        </span>
                                     </td>
-                                    <td style={S.td}>
-                                        <span style={S.badge(u.isBanned ? 'Banned' : 'Active')}>{u.isBanned ? 'Restricted' : 'Authenticated'}</span>
-                                    </td>
-                                    <td style={{ ...S.td, textAlign: 'right' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+                                    <td className="px-8 py-5 text-right">
+                                        <div className="flex justify-end gap-2.5">
                                             <button
                                                 onClick={() => openEditModal(u)}
+                                                className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 hover:bg-slate-900 hover:text-white flex items-center justify-center transition-all cursor-pointer"
                                                 title="Edit Profile"
-                                                style={{ width: 42, height: 42, borderRadius: 12, border: 'none', background: '#f1f5f9', color: '#64748b', cursor: 'pointer', transition: '0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                                                onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)' }}
-                                                onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none' }}
                                             >
-                                                <Edit size={18} />
+                                                <Edit size={16} />
                                             </button>
                                             <button
                                                 onClick={() => toggleBan(u._id, u.isBanned)}
+                                                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer border ${u.isBanned ? 'bg-green-50 text-green-500 border-green-200' : 'bg-red-50 text-red-500 border-red-200'} hover:scale-105 shadow-sm active:scale-95`}
                                                 title={u.isBanned ? "Reinstate Account" : "Suspend Account"}
-                                                style={{ width: 42, height: 42, borderRadius: 12, border: 'none', background: u.isBanned ? '#f0fdf4' : '#fef2f2', color: u.isBanned ? '#16a34a' : '#ef4444', cursor: 'pointer', transition: '0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                                                onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)' }}
-                                                onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none' }}
                                             >
                                                 {u.isBanned ? <UserCheck size={18} /> : <Ban size={18} />}
                                             </button>
@@ -254,119 +241,99 @@ const Users = ({ url, token }) => {
                     </table>
                 </div>
 
-                {/* Database Statistics Footer */}
-                <div style={{ padding: '24px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff', borderTop: '1.6px solid #f8fafc' }}>
-                    <p style={{ fontSize: 11, fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1.2 }}>
-                        Mapping <span style={{ color: '#0f172a' }}>{filteredUsers.length}</span> / <span style={{ color: '#0f172a' }}>{users.length}</span> Active Identities
+                <div className="px-8 py-6 bg-slate-50/50 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">
+                        Displaying <span className="text-slate-900">{filteredUsers.length}</span> / <span className="text-slate-900">{users.length}</span> Active Identities
                     </p>
-                    {users.length > 10 && (
-                        <div style={{ display: 'flex', gap: 12 }}>
-                            <button style={{ width: 44, height: 44, borderRadius: 14, border: '2px solid #f1f5f9', background: '#fff', cursor: 'pointer', color: '#cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronLeft size={20} /></button>
-                            <button style={{ width: 44, height: 44, borderRadius: 14, border: '2px solid #f1f5f9', background: '#fff', cursor: 'pointer', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronRight size={20} /></button>
-                        </div>
-                    )}
+                    <div className="flex gap-2">
+                        <button className="px-4 py-2 border border-slate-200 bg-white text-slate-300 rounded-xl font-black text-xs uppercase cursor-not-allowed">Previous</button>
+                        <button className="px-4 py-2 border border-slate-200 bg-white text-slate-900 rounded-xl font-black text-xs uppercase hover:bg-slate-50 transition-colors">Next</button>
+                    </div>
                 </div>
             </div>
 
             {/* Edit User Modal */}
             {showEditModal && (
-                <div className="modal-overlay" style={{
-                    position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-                    background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
-                    animation: 'fadeIn 0.3s ease'
-                }}>
-                    <div className="card shadow-premium animate-scaleIn" style={{
-                        width: '95%', maxWidth: 500, padding: 0, overflow: 'hidden', border: 'none',
-                        maxHeight: '90vh', overflowY: 'auto'
-                    }}>
-                        <div style={{ padding: '24px 32px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                <div style={{ width: 40, height: 40, borderRadius: 12, background: '#fff0ed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <Edit size={20} color="#ff6347" />
+                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-[1000] p-4 animate-fadeIn">
+                    <div className="bg-white rounded-[40px] shadow-2xl w-full max-w-lg overflow-hidden animate-scaleIn">
+                        <div className="px-8 py-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/20">
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 bg-primary-light rounded-xl flex items-center justify-center text-primary">
+                                    <Edit size={20} />
                                 </div>
                                 <div>
-                                    <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0f172a' }}>Edit Customer Profile</h2>
-                                    <p style={{ fontSize: 11, color: '#94a3b8', fontWeight: 700 }}>Update identity details for {selectedUser?.name}</p>
+                                    <h2 className="text-lg font-black text-slate-900 leading-none">Edit Customer Profile</h2>
+                                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 line-clamp-1">Update details for {selectedUser?.name}</p>
                                 </div>
                             </div>
-                            <button onClick={() => setShowEditModal(false)} style={{ background: '#f1f5f9', border: 'none', padding: 8, borderRadius: 10, cursor: 'pointer', color: '#64748b' }}>
+                            <button onClick={() => setShowEditModal(false)} className="w-10 h-10 rounded-xl bg-slate-100 text-slate-400 hover:text-slate-900 flex items-center justify-center transition-colors">
                                 <X size={20} />
                             </button>
                         </div>
 
-                        <form onSubmit={onUpdateUser} style={{ padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
-                            {/* Profile Picture Upload */}
-                            <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                <div style={{ position: 'relative' }}>
-                                    <div style={{
-                                        width: 100, height: 100, borderRadius: '50%', border: '4px solid #fff',
-                                        boxShadow: '0 10px 25px rgba(0,0,0,0.1)', overflow: 'hidden', background: '#f8fafc'
-                                    }}>
+                        <form onSubmit={onUpdateUser} className="p-10 flex flex-col gap-8">
+                            <div className="flex justify-center">
+                                <div className="relative group">
+                                    <div className="w-28 h-28 rounded-full border-4 border-white shadow-premium overflow-hidden bg-slate-50 ring-2 ring-slate-100">
                                         {editImage ? (
-                                            <img src={URL.createObjectURL(editImage)} alt="profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            <img src={URL.createObjectURL(editImage)} alt="profile" className="w-full h-full object-cover" />
                                         ) : selectedUser?.image ? (
-                                            <img src={`${url}/images/${selectedUser.image}`} alt="profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            <img src={`${url}/images/${selectedUser.image}`} alt="profile" className="w-full h-full object-cover" />
                                         ) : (
-                                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f1f5f9' }}>
-                                                <UsersIcon size={40} style={{ color: '#cbd5e1' }} />
+                                            <div className="w-full h-full flex items-center justify-center bg-slate-50">
+                                                <UsersIcon size={48} className="text-slate-200" />
                                             </div>
                                         )}
                                     </div>
-                                    <label htmlFor="user-image-edit" style={{
-                                        position: 'absolute', bottom: 0, right: 0,
-                                        width: 32, height: 32, background: '#ff6347', borderRadius: '50%',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        cursor: 'pointer', border: '3px solid #fff', color: '#fff', boxShadow: '0 4px 10px rgba(0,0,0,0.15)'
-                                    }}>
+                                    <label htmlFor="user-image-edit" className="absolute bottom-0 right-0 w-9 h-9 bg-primary text-white rounded-full flex items-center justify-center cursor-pointer border-4 border-white shadow-xl hover:scale-110 hover:bg-primary-dark transition-all">
                                         <Camera size={14} />
                                     </label>
-                                    <input type="file" id="user-image-edit" hidden onChange={e => setEditImage(e.target.files[0])} />
+                                    <input type="file" id="user-image-edit" className="hidden" onChange={e => setEditImage(e.target.files[0])} />
                                 </div>
                             </div>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                                <div>
-                                    <label style={{ fontSize: 11, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8, display: 'block' }}>Full Name</label>
-                                    <div style={{ position: 'relative' }}>
-                                        <UsersIcon size={18} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#cbd5e1' }} />
+                            <div className="flex flex-col gap-5">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[2px] ml-1">Full Name</label>
+                                    <div className="relative group">
+                                        <UsersIcon size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors" />
                                         <input
-                                            className="admin-input" style={{ paddingLeft: 48 }}
+                                            className="admin-input pl-12 h-14"
                                             value={editData.name} onChange={e => setEditData({ ...editData, name: e.target.value })}
-                                            required placeholder="Enter full name"
+                                            required placeholder="Full name of customer"
                                         />
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label style={{ fontSize: 11, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8, display: 'block' }}>Email Address</label>
-                                    <div style={{ position: 'relative' }}>
-                                        <Mail size={18} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#cbd5e1' }} />
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[2px] ml-1">Email Address</label>
+                                    <div className="relative group">
+                                        <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors" />
                                         <input
-                                            type="email" className="admin-input" style={{ paddingLeft: 48 }}
+                                            type="email" className="admin-input pl-12 h-14"
                                             value={editData.email} onChange={e => setEditData({ ...editData, email: e.target.value })}
-                                            required placeholder="name@example.com"
+                                            required placeholder="customer@ident.com"
                                         />
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label style={{ fontSize: 11, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8, display: 'block' }}>Mobile Number</label>
-                                    <div style={{ position: 'relative' }}>
-                                        <Phone size={18} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#cbd5e1' }} />
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[2px] ml-1">Contact Phone</label>
+                                    <div className="relative group">
+                                        <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors" />
                                         <input
-                                            className="admin-input" style={{ paddingLeft: 48 }}
+                                            className="admin-input pl-12 h-14"
                                             value={editData.phone} onChange={e => setEditData({ ...editData, phone: e.target.value })}
-                                            placeholder="Enter mobile number"
+                                            placeholder="Emergency contact or phone"
                                         />
                                     </div>
                                 </div>
                             </div>
 
-                            <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
-                                <button type="button" onClick={() => setShowEditModal(false)} className="admin-input" style={{ background: '#f8fafc', color: '#64748b', border: '1.5px solid #e2e8f0', flex: 1, cursor: 'pointer' }}>Cancel</button>
-                                <button type="submit" disabled={updateLoading} className="btn-primary" style={{ flex: 1, padding: 14, justifyContent: 'center' }}>
-                                    {updateLoading ? <Loader2 className="animate-spin" size={20} /> : (
+                            <div className="flex gap-4 pt-4">
+                                <button type="button" onClick={() => setShowEditModal(false)} className="flex-1 px-8 py-4 rounded-2xl border-2 border-slate-100 font-black text-xs uppercase tracking-widest text-slate-400 hover:bg-slate-50 transition-all cursor-pointer">Cancel</button>
+                                <button type="submit" disabled={updateLoading} className="flex-1 bg-slate-900 text-white rounded-2xl flex items-center justify-center gap-2.5 font-black text-xs uppercase tracking-widest hover:bg-primary transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl active:scale-95">
+                                    {updateLoading ? <Loader2 className="animate-spin" size={18} /> : (
                                         <>
                                             <Save size={18} />
                                             Update Profile

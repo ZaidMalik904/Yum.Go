@@ -11,6 +11,16 @@ const Header = () => {
         setSearchQuery(e.target.value);
     }
 
+    const scrollToResults = () => {
+        document.getElementById('restaurant-display')?.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            scrollToResults();
+        }
+    }
+
     return (
         <div className='header relative h-[60vh] md:h-[42vw] my-6 md:my-10 mx-4 md:mx-[5vw] rounded-[32px] md:rounded-[40px] overflow-hidden shadow-2xl group' id='home'>
             {/* --- Premium Background Layer --- */}
@@ -37,11 +47,11 @@ const Header = () => {
                     <span className='text-transparent bg-clip-text bg-gradient-to-r from-[tomato] to-[#ff4500]'>At Your Doorstep.</span>
                 </h1>
 
-                <p className='text-white/80 text-xs md:text-[1.3vw] font-medium max-w-[500px] leading-relaxed drop-shadow-lg opacity-0 animate-fadeIn' style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}>
+                <p className='text-white/80 text-xs md:text-[1.3vw] font-medium max-w-[500px] leading-relaxed drop-shadow-lg animate-fadeIn [animation-delay:0.4s]'>
                     Access an exclusive directory of Michelin-standard restaurants. Precision preparation, lightning-fast delivery.
                 </p>
 
-                <div className='flex flex-col sm:flex-row items-center gap-4 mt-2 w-full max-w-[600px] opacity-0 animate-fadeIn' style={{ animationDelay: '0.6s', animationFillMode: 'forwards' }}>
+                <div className='flex flex-col sm:flex-row items-center gap-4 mt-2 w-full max-w-[600px] animate-fadeIn [animation-delay:0.6s]'>
                     <div className='relative flex-1 w-full'>
                         <div className='absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-[tomato]'>
                             <ArrowRight size={18} />
@@ -50,12 +60,13 @@ const Header = () => {
                             type="text"
                             value={headerSearch}
                             onChange={handleSearch}
+                            onKeyDown={handleKeyDown}
                             placeholder='Search a dish...'
                             className='w-full bg-white/10 backdrop-blur-xl border border-white/20 text-white rounded-[20px] md:rounded-[24px] py-4 md:py-5 px-12 md:px-14 outline-none focus:ring-2 focus:ring-[tomato]/30 transition-all font-medium placeholder:text-white/40 text-sm'
                         />
                         <button
                             className='absolute right-2 top-1/2 -translate-y-1/2 bg-[tomato] text-white px-4 md:px-6 py-2.5 md:py-3 rounded-[15px] md:rounded-[18px] font-black text-[10px] md:text-xs uppercase tracking-widest hover:bg-[#ff4500] transition-colors'
-                            onClick={() => window.scrollTo({ top: 800, behavior: 'smooth' })}
+                            onClick={scrollToResults}
                         >
                             Find
                         </button>
@@ -73,7 +84,7 @@ const Header = () => {
                 </div>
 
                 {/* --- Bottom Feature Tags --- */}
-                <div className='flex flex-wrap items-center gap-8 mt-4 pt-8 border-t border-white/10 opacity-0 animate-fadeIn' style={{ animationDelay: '0.8s', animationFillMode: 'forwards' }}>
+                <div className='flex flex-wrap items-center gap-8 mt-4 pt-8 border-t border-white/10 animate-fadeIn [animation-delay:0.8s]'>
                     <div className='flex items-center gap-3 text-white/60'>
                         <ShieldCheck size={20} className='text-[tomato]' />
                         <span className='text-[10px] font-black uppercase tracking-widest'>Verified Vendors</span>
