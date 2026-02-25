@@ -15,6 +15,7 @@ import Verify from './pages/Verify/Verify'
 import MyOrders from './pages/MyOrders/MyOrders'
 import Restaurant from './pages/Restaurant'
 import Support from './pages/Support'
+import Profile from './pages/Profile/Profile'
 
 const App = () => {
 
@@ -35,6 +36,7 @@ const App = () => {
 
           <Route path='/verify' element={<Verify />} />
           <Route path='/my-orders' element={<MyOrders />} />
+          <Route path='/profile' element={<Profile />} />
           <Route path='/support' element={<Support />} />
         </Routes>
         <Footer />

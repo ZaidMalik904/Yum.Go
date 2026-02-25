@@ -8,11 +8,29 @@ const StoreContextProvider = (props) => {
     const [restaurant_list, setRestaurantList] = useState([]);
     const [cartItems, setCartItems] = useState({});
     const [menu, setMenu] = useState("home");
+    const [userData, setUserData] = useState(null);
 
     const [searchQuery, setSearchQuery] = useState("");
     const [discount, setDiscount] = useState(0);
 
     const url = "https://yum-go.onrender.com";
+
+    // Fetch user profile from backend
+    const fetchUserProfile = async (authToken) => {
+        const tkn = authToken || token;
+        if (!tkn) {
+            setUserData(null);
+            return;
+        }
+        try {
+            const response = await axios.get(url + "/api/user/profile", { headers: { token: tkn } });
+            if (response.data.success) {
+                setUserData(response.data.user);
+            }
+        } catch (error) {
+            console.error("Fetch profile error:", error);
+        }
+    };
 
     // Initial Data Load
     useEffect(() => {
@@ -107,7 +125,10 @@ const StoreContextProvider = (props) => {
                 } catch (error) {
                     console.error("Sync cart error:", error);
                 }
+                // Fetch user profile when token is available
+                fetchUserProfile(token);
             } else {
+                setUserData(null);
                 // Load local cart if no token (guest mode)
                 const storedCart = localStorage.getItem("cartItems");
                 if (storedCart) {
@@ -155,7 +176,11 @@ const StoreContextProvider = (props) => {
         setSearchQuery,
         discount,
         setDiscount,
-        applyPromoCode
+        applyPromoCode,
+
+        userData,
+        setUserData,
+        fetchUserProfile
     };
 
     return (

@@ -5,7 +5,7 @@ import { ShoppingCart, LogOut, User, Menu, X, ChevronDown, Search } from 'lucide
 import { assets } from '../assets/assets';
 
 const Navbar = ({ setShowLogin }) => {
-    const { token, setToken, menu, setMenu, cartItems, setSearchQuery } = useContext(StoreContext);
+    const { token, setToken, menu, setMenu, cartItems, setSearchQuery, userData, url } = useContext(StoreContext);
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [navSearch, setNavSearch] = useState("");
@@ -33,6 +33,11 @@ const Navbar = ({ setShowLogin }) => {
         localStorage.removeItem("token");
         setToken("");
         navigate("/");
+    };
+
+    const getInitials = (name) => {
+        if (!name) return '?';
+        return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
     };
 
     const cartCount = Object.values(cartItems || {}).reduce((a, b) => a + b, 0);
@@ -120,17 +125,33 @@ const Navbar = ({ setShowLogin }) => {
                     ) : (
                         <div className='relative group hidden md:block'>
                             <button className='flex items-center gap-3 p-2 pr-4 bg-slate-50 rounded-2xl border border-transparent hover:border-slate-200 transition-all'>
-                                <div className='w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-[tomato]'>
-                                    <User size={20} />
+                                <div className='w-10 h-10 rounded-xl shadow-sm flex items-center justify-center overflow-hidden'>
+                                    {userData?.image ? (
+                                        <img src={`${url}/images/${userData.image}`} alt={userData.name} className='w-full h-full object-cover' />
+                                    ) : (
+                                        <div className='w-full h-full bg-gradient-to-br from-[#ff6347] to-[#ff4500] flex items-center justify-center text-white text-xs font-black'>
+                                            {getInitials(userData?.name)}
+                                        </div>
+                                    )}
                                 </div>
                                 <div className='flex flex-col items-start'>
-                                    <span className='text-[10px] text-slate-400 font-bold uppercase tracking-widest'>Profile</span>
-                                    <ChevronDown size={14} className='text-slate-600 transition-transform group-hover:rotate-180' />
+                                    <span className='text-[10px] text-slate-400 font-bold uppercase tracking-widest'>Welcome</span>
+                                    <span className='text-xs font-bold text-slate-700 max-w-[80px] truncate'>{userData?.name?.split(' ')[0] || 'User'}</span>
                                 </div>
+                                <ChevronDown size={14} className='text-slate-400 transition-transform group-hover:rotate-180' />
                             </button>
 
                             {/* Dropdown Menu */}
                             <div className='absolute right-0 top-full mt-3 w-56 bg-white rounded-3xl shadow-2xl border border-slate-100 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform translate-y-2 group-hover:translate-y-0'>
+                                {/* User Info Header */}
+                                <div className='px-4 py-3 border-b border-slate-100 mb-1'>
+                                    <p className='text-sm font-bold text-slate-800 truncate'>{userData?.name || 'User'}</p>
+                                    <p className='text-xs text-slate-400 truncate'>{userData?.email || ''}</p>
+                                </div>
+                                <button onClick={() => navigate('/profile')} className='w-full flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-600 text-sm font-bold text-left'>
+                                    <User size={18} className='text-[tomato]' />
+                                    My Profile
+                                </button>
                                 <button onClick={() => navigate('/my-orders')} className='w-full flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-600 text-sm font-bold text-left'>
                                     <ShoppingCart size={18} className='text-blue-500' />
                                     My Orders
@@ -185,6 +206,23 @@ const Navbar = ({ setShowLogin }) => {
                             </button>
                         ) : (
                             <div className='flex flex-col gap-4'>
+                                {/* Mobile User Info */}
+                                <div className='flex items-center gap-4 pb-6 mb-2 border-b border-slate-100'>
+                                    <div className='w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0'>
+                                        {userData?.image ? (
+                                            <img src={`${url}/images/${userData.image}`} alt={userData.name} className='w-full h-full object-cover' />
+                                        ) : (
+                                            <div className='w-full h-full bg-gradient-to-br from-[#ff6347] to-[#ff4500] flex items-center justify-center text-white text-lg font-black'>
+                                                {getInitials(userData?.name)}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <p className='text-lg font-black text-slate-900'>{userData?.name || 'User'}</p>
+                                        <p className='text-xs text-slate-400 font-medium'>{userData?.email || ''}</p>
+                                    </div>
+                                </div>
+                                <button onClick={() => { navigate('/profile'); setIsMenuOpen(false); }} className='flex items-center gap-4 text-slate-900 text-2xl font-black no-underline'><User size={28} className='text-[tomato]' /> My Profile</button>
                                 <button onClick={() => { navigate('/my-orders'); setIsMenuOpen(false); }} className='flex items-center gap-4 text-slate-900 text-2xl font-black no-underline'><ShoppingCart size={28} className='text-blue-500' /> Live Orders</button>
                                 <button onClick={() => { logout(); setIsMenuOpen(false); }} className='flex items-center gap-4 text-slate-400 text-xl font-bold'><LogOut size={24} /> Log Out</button>
                             </div>
