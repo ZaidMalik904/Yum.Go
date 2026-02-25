@@ -3,14 +3,12 @@ import axios from 'axios'
 import { toast } from 'react-toastify'
 import { Trash2, ShoppingBasket, Filter, Search } from 'lucide-react'
 
-const CATEGORIES = ['All', 'Salad', 'Rolls', 'Desserts', 'Sandwich', 'Cake', 'Pure Veg', 'Pasta', 'Noodles', 'Pizza', 'Burger', 'Ice Cream', 'Drinks']
+
 
 const List = ({ url }) => {
   const [list, setList] = useState([])
-  const [currCategory, setCurrCategory] = useState('All')
   const [searchTerm, setSearchTerm] = useState('')
   const [loading, setLoading] = useState(true)
-  const [showFilter, setShowFilter] = useState(false)
   const [isMobileView, setIsMobileView] = useState(window.innerWidth < 1024)
 
   const listFood = useCallback(async () => {
@@ -42,9 +40,7 @@ const List = ({ url }) => {
   }, [listFood])
 
   const filtered = list.filter(i => {
-    const matchesCategory = currCategory === 'All' || i.category === currCategory;
-    const matchesSearch = i.name.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
+    return i.name.toLowerCase().includes(searchTerm.toLowerCase());
   })
 
   return (
@@ -77,36 +73,7 @@ const List = ({ url }) => {
             />
           </div>
 
-          {/* Filter Dropdown */}
-          <div className="relative shrink-0">
-            <button
-              onClick={() => setShowFilter(!showFilter)}
-              className={`h-full flex items-center gap-2 px-5 rounded-2xl border-2 font-black text-xs uppercase tracking-widest transition-all duration-200 cursor-pointer whitespace-nowrap ${currCategory !== 'All'
-                  ? 'border-primary bg-primary-light text-primary'
-                  : 'border-slate-200 bg-white text-slate-500 hover:border-primary/30'
-                }`}
-            >
-              <Filter size={15} />
-              <span>{currCategory === 'All' ? 'Category' : currCategory}</span>
-            </button>
 
-            {showFilter && (
-              <div className="absolute top-full right-0 mt-2 bg-white rounded-[24px] shadow-2xl border border-slate-100 min-w-[190px] z-50 p-2 animate-fadeInDown overflow-hidden">
-                <div className="max-h-[300px] overflow-y-auto">
-                  {CATEGORIES.map(c => (
-                    <div
-                      key={c}
-                      onClick={() => { setCurrCategory(c); setShowFilter(false); }}
-                      className={`px-5 py-2.5 rounded-xl text-[12px] font-black cursor-pointer transition-all ${currCategory === c ? 'bg-primary-light text-primary' : 'text-slate-500 hover:bg-slate-50'
-                        }`}
-                    >
-                      {c}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
         </div>
       </div>
 
@@ -121,7 +88,7 @@ const List = ({ url }) => {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-slate-50/50 border-b border-slate-100">
-                  {['Preview', 'Item Identity', 'Category Tag', 'Price Point', 'Action'].map((h, i) => (
+                  {['Preview', 'Item Identity', 'Price Point', 'Action'].map((h, i) => (
                     <th key={i} className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-8 py-5 text-left">{h}</th>
                   ))}
                 </tr>
@@ -130,7 +97,7 @@ const List = ({ url }) => {
                 {filtered.length === 0 ? (
                   <tr>
                     <td colSpan="5" className="py-24 text-center">
-                      <p className="text-slate-300 font-black italic">No culinary masterpieces found in this category.</p>
+                      <p className="text-slate-300 font-black italic">No culinary masterpieces found.</p>
                     </td>
                   </tr>
                 ) : (
@@ -153,12 +120,7 @@ const List = ({ url }) => {
                           <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest mt-1">ID: {item._id.slice(-6).toUpperCase()}</span>
                         </div>
                       </td>
-                      {/* Category */}
-                      <td className="px-8 py-5">
-                        <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-black uppercase tracking-widest border border-slate-200">
-                          {item.category}
-                        </span>
-                      </td>
+
                       {/* Price */}
                       <td className="px-8 py-5">
                         <span className="text-lg font-black text-slate-900 tracking-tighter">${item.price}</span>

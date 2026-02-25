@@ -10,8 +10,91 @@ const COLLECTIONS = [
     { name: "Global Flavors", icon: "🌍", desc: "Authentic international cuisines", color: "#ec4899" }
 ];
 
+
+
+const RestaurantCard = ({ item, url, navigate }) => {
+    const isApproved = item.isApproved === true;
+    return (
+        <div
+            onClick={() => isApproved ? navigate(`/restaurant/${item._id}`) : null}
+            className={`group relative bg-white rounded-[32px] overflow-hidden transition-all duration-500 shadow-premium hover:shadow-[0_20px_50px_rgba(0,0,0,0.12)] ${isApproved ? 'hover:-translate-y-3 cursor-pointer' : 'opacity-80 grayscale cursor-not-allowed'} animate-fadeInScale`}
+        >
+            {/* Image Core */}
+            <div className='relative h-[240px] overflow-hidden'>
+                <img
+                    className='w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110'
+                    src={url + "/images/" + item.image}
+                    alt={item.name}
+                    onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "https://placehold.co/600x400/f8fafc/ff6347?text=" + item.name;
+                    }}
+                />
+                <div className='absolute inset-0 bg-gradient-to-t from-[#0f172a]/80 via-transparent to-transparent opacity-60'></div>
+
+                {/* Status Badges */}
+                <div className='absolute top-5 left-5 flex flex-col gap-2'>
+                    {item.rating >= 4.5 && (
+                        <div className='bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2 shadow-lg'>
+                            <UtensilsCrossed size={12} className='text-[tomato]' />
+                            <span className='font-black text-[10px] text-slate-800 uppercase tracking-widest'>Michelin Standard</span>
+                        </div>
+                    )}
+                    <div className='bg-[#0f172a]/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2 shadow-lg'>
+                        <Zap size={12} className='text-[#fbbf24]' />
+                        <span className='font-black text-[10px] text-white uppercase tracking-widest'>Fast Track</span>
+                    </div>
+                </div>
+
+                <div className='absolute bottom-5 right-5 bg-white px-3 py-2 rounded-2xl flex items-center gap-1.5 shadow-xl'>
+                    <Star size={14} fill="#fbbf24" stroke="#fbbf24" />
+                    <span className='font-black text-slate-900 text-sm'>{item.rating || "4.5"}</span>
+                </div>
+            </div>
+
+            {/* Info Block */}
+            <div className='p-7'>
+                <div className='flex flex-col gap-2 mb-4'>
+                    <div className='flex items-center gap-2'>
+                        <ShieldCheck size={14} className='text-blue-500' />
+                        <span className='text-blue-600/80 text-[10px] font-black uppercase tracking-widest'>Verified Boutique</span>
+                    </div>
+                    <h3 className='text-2xl font-black text-[#0f172a] tracking-tight group-hover:text-[tomato] transition-colors'>
+                        {item.name}
+                    </h3>
+                    <p className='text-slate-400 text-sm font-medium line-clamp-2 h-10 leading-relaxed'>
+                        {item.description || "Indulge in a curated selection of gourmet flavors, prepared with the freshest local ingredients."}
+                    </p>
+                </div>
+
+                <div className='flex items-center justify-between pt-5 border-t border-slate-50'>
+                    <div className='flex flex-col'>
+                        <span className='text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1'>Location</span>
+                        <div className='flex items-center gap-1.5'>
+                            <MapPin size={12} className='text-[tomato]' />
+                            <span className='text-xs font-bold text-slate-600 truncate max-w-[120px]'>{item.address.split(',')[0]}</span>
+                        </div>
+                    </div>
+                    <div className='flex flex-col items-end'>
+                        <span className='text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1'>Est. Time</span>
+                        <div className='flex items-center gap-1.5'>
+                            <Clock size={12} className='text-slate-400' />
+                            <span className='text-xs font-black text-slate-800'>25-35 MIN</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button className='w-full mt-6 py-4 bg-slate-50 group-hover:bg-[tomato] rounded-2xl flex items-center justify-center gap-2 transition-all duration-300'>
+                    <span className='text-xs font-black uppercase tracking-widest text-slate-400 group-hover:text-white'>View Executive Menu</span>
+                    <ArrowRight size={14} className='text-slate-300 group-hover:text-white transform group-hover:translate-x-1 transition-transform' />
+                </button>
+            </div>
+        </div>
+    );
+};
+
 const RestaurantDisplay = () => {
-    const { restaurant_list, url, searchQuery } = useContext(StoreContext);
+    const { restaurant_list, food_list, url, searchQuery } = useContext(StoreContext);
     const [selectedCollection, setSelectedCollection] = useState("All");
     const navigate = useNavigate();
 
@@ -60,6 +143,8 @@ const RestaurantDisplay = () => {
                 </div>
             </div>
 
+
+
             {/* --- Restaurant Grid --- */}
             <div className='restaurant-display-list min-h-[400px]'>
                 {(() => {
@@ -67,13 +152,14 @@ const RestaurantDisplay = () => {
                         // Search Filtering
                         if (searchQuery && !item.name.toLowerCase().includes(searchQuery.toLowerCase()) && !item.description?.toLowerCase().includes(searchQuery.toLowerCase())) return false;
 
+
+
                         // Comprehensive Collection Filtering
                         if (selectedCollection !== "All") {
                             if (selectedCollection === "Gourmet Dining" && (item.rating || 0) < 4.5) return false;
-                            if (selectedCollection === "Express Delivery" && item.name.toLowerCase().includes("bistro")) return false;
-                            if (selectedCollection === "Healthy Eats" && !item.description?.toLowerCase().includes("organic") && !item.description?.toLowerCase().includes("fresh")) return false;
-                            if (selectedCollection === "Global Flavors" && !item.name.toLowerCase().includes("italia") && !item.name.toLowerCase().includes("sushi")) return false;
+                            if (selectedCollection === "Express Delivery" && (item.rating || 0) < 4.0) return false;
                         }
+
                         return true;
                     });
 
@@ -81,12 +167,12 @@ const RestaurantDisplay = () => {
                         return (
                             <div className='flex flex-col items-center justify-center py-20 w-full col-span-full opacity-0 animate-fadeIn'>
                                 <div className='w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center text-5xl mb-6 shadow-inner'>🔍</div>
-                                <h3 className='text-3xl font-black text-slate-800 tracking-tight'>No Results for "{searchQuery}"</h3>
+                                <h3 className='text-3xl font-black text-slate-800 tracking-tight'>No Results for "{searchQuery || selectedCollection}"</h3>
                                 <p className='text-slate-400 mt-3 text-center max-w-sm font-medium'>
                                     We couldn't find any culinary partners matching your criteria. Try adjusting your search query or exploring different categories.
                                 </p>
                                 <button
-                                    onClick={() => { setSelectedCollection("All"); document.querySelector('input')?.focus() }}
+                                    onClick={() => { setSelectedCollection("All"); setSearchQuery(""); }}
                                     className='mt-8 text-[tomato] font-black uppercase text-xs tracking-widest hover:underline'
                                 >
                                     Clear all filters
@@ -97,88 +183,9 @@ const RestaurantDisplay = () => {
 
                     return (
                         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12'>
-                            {filteredItems.map((item, index) => {
-                                const isApproved = item.isApproved === true;
-                                return (
-                                    <div
-                                        key={index}
-                                        onClick={() => isApproved ? navigate(`/restaurant/${item._id}`) : null}
-                                        className={`group relative bg-white rounded-[32px] overflow-hidden transition-all duration-500 shadow-premium hover:shadow-[0_20px_50px_rgba(0,0,0,0.12)] ${isApproved ? 'hover:-translate-y-3 cursor-pointer' : 'opacity-80 grayscale cursor-not-allowed'} animate-fadeInScale [animation-delay:calc(var(--index)*0.1s)]`}
-                                        style={{ '--index': index }}
-                                    >
-                                        {/* Image Core */}
-                                        <div className='relative h-[240px] overflow-hidden'>
-                                            <img
-                                                className='w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110'
-                                                src={url + "/images/" + item.image}
-                                                alt={item.name}
-                                                onError={(e) => {
-                                                    e.target.onerror = null;
-                                                    e.target.src = "https://placehold.co/600x400/f8fafc/ff6347?text=" + item.name;
-                                                }}
-                                            />
-                                            <div className='absolute inset-0 bg-gradient-to-t from-[#0f172a]/80 via-transparent to-transparent opacity-60'></div>
-
-                                            {/* Status Badges */}
-                                            <div className='absolute top-5 left-5 flex flex-col gap-2'>
-                                                {item.rating >= 4.5 && (
-                                                    <div className='bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2 shadow-lg'>
-                                                        <UtensilsCrossed size={12} className='text-[tomato]' />
-                                                        <span className='font-black text-[10px] text-slate-800 uppercase tracking-widest'>Michelin Standard</span>
-                                                    </div>
-                                                )}
-                                                <div className='bg-[#0f172a]/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2 shadow-lg'>
-                                                    <Zap size={12} className='text-[#fbbf24]' />
-                                                    <span className='font-black text-[10px] text-white uppercase tracking-widest'>Fast Track</span>
-                                                </div>
-                                            </div>
-
-                                            <div className='absolute bottom-5 right-5 bg-white px-3 py-2 rounded-2xl flex items-center gap-1.5 shadow-xl'>
-                                                <Star size={14} fill="#fbbf24" stroke="#fbbf24" />
-                                                <span className='font-black text-slate-900 text-sm'>{item.rating || "4.5"}</span>
-                                            </div>
-                                        </div>
-
-                                        {/* Info Block */}
-                                        <div className='p-7'>
-                                            <div className='flex flex-col gap-2 mb-4'>
-                                                <div className='flex items-center gap-2'>
-                                                    <ShieldCheck size={14} className='text-blue-500' />
-                                                    <span className='text-blue-600/80 text-[10px] font-black uppercase tracking-widest'>Verified Boutique</span>
-                                                </div>
-                                                <h3 className='text-2xl font-black text-[#0f172a] tracking-tight group-hover:text-[tomato] transition-colors'>
-                                                    {item.name}
-                                                </h3>
-                                                <p className='text-slate-400 text-sm font-medium line-clamp-2 h-10 leading-relaxed'>
-                                                    {item.description || "Indulge in a curated selection of gourmet flavors, prepared with the freshest local ingredients."}
-                                                </p>
-                                            </div>
-
-                                            <div className='flex items-center justify-between pt-5 border-t border-slate-50'>
-                                                <div className='flex flex-col'>
-                                                    <span className='text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1'>Location</span>
-                                                    <div className='flex items-center gap-1.5'>
-                                                        <MapPin size={12} className='text-[tomato]' />
-                                                        <span className='text-xs font-bold text-slate-600 truncate max-w-[120px]'>{item.address.split(',')[0]}</span>
-                                                    </div>
-                                                </div>
-                                                <div className='flex flex-col items-end'>
-                                                    <span className='text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1'>Est. Time</span>
-                                                    <div className='flex items-center gap-1.5'>
-                                                        <Clock size={12} className='text-slate-400' />
-                                                        <span className='text-xs font-black text-slate-800'>25-35 MIN</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <button className='w-full mt-6 py-4 bg-slate-50 group-hover:bg-[tomato] rounded-2xl flex items-center justify-center gap-2 transition-all duration-300'>
-                                                <span className='text-xs font-black uppercase tracking-widest text-slate-400 group-hover:text-white'>View Executive Menu</span>
-                                                <ArrowRight size={14} className='text-slate-300 group-hover:text-white transform group-hover:translate-x-1 transition-transform' />
-                                            </button>
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                            {filteredItems.map((item, index) => (
+                                <RestaurantCard key={index} item={item} url={url} navigate={navigate} />
+                            ))}
                         </div>
                     )
                 })()}

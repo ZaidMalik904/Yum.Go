@@ -38,7 +38,7 @@ const Navbar = ({ setShowLogin }) => {
     const cartCount = Object.values(cartItems || {}).reduce((a, b) => a + b, 0);
 
     return (
-        <header className="sticky top-0 z-[100] bg-white border-b border-slate-100">
+        <header className="fixed top-0 left-0 w-full z-[100] bg-white border-b border-slate-100">
             <div className="max-w-[1440px] mx-auto px-6 md:px-[5vw] h-20 md:h-24 flex justify-between items-center">
 
                 {/* --- Logo Area --- */}

@@ -158,8 +158,8 @@ const Support = ({ url, token }) => {
                                 <h3 className="text-base font-black text-slate-900 leading-tight tracking-tight mb-5">{t.subject}</h3>
                                 <div className="flex justify-between items-center pt-4 border-t border-slate-50">
                                     <div className="flex items-center gap-2">
-                                        <div className="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center text-[10px] font-black text-slate-500 uppercase">{t.userName[0]}</div>
-                                        <span className="text-xs font-black text-slate-500 truncate max-w-[100px]">{t.userName.split(' ')[0]}</span>
+                                        <div className="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center text-[10px] font-black text-slate-500 uppercase">{t.userName ? t.userName[0] : '?'}</div>
+                                        <span className="text-xs font-black text-slate-500 truncate max-w-[100px]">{t.userName ? t.userName.split(' ')[0] : 'Customer'}</span>
                                     </div>
                                     <span className="text-[10px] font-bold text-slate-400 uppercase">{new Date(t.createdAt).toLocaleDateString()}</span>
                                 </div>
@@ -184,9 +184,9 @@ const Support = ({ url, token }) => {
                             <div className="px-8 py-6 bg-slate-900 text-white flex justify-between items-center relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary opacity-10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
                                 <div className="flex items-center gap-4 z-10">
-                                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center font-black text-lg shadow-[0_8px_16px_rgba(255,100,70,0.3)]">{activeTicket.userName[0]}</div>
+                                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center font-black text-lg shadow-[0_8px_16px_rgba(255,100,70,0.3)]">{activeTicket.userName ? activeTicket.userName[0] : '?'}</div>
                                     <div>
-                                        <p className="font-black text-lg tracking-tight leading-none">{activeTicket.userName}</p>
+                                        <p className="font-black text-lg tracking-tight leading-none">{activeTicket.userName || 'Customer'}</p>
                                         <div className="flex items-center gap-2.5 mt-2">
                                             <span className="text-[10px] font-black text-slate-400 tracking-wider">#{activeTicket._id.slice(-6).toUpperCase()}</span>
                                             <div className="w-1 h-1 bg-slate-600 rounded-full"></div>

@@ -16,7 +16,6 @@ const addFood = async (req, res) => {
             description: req.body.description,
             price: req.body.price,
             image: image_filename,
-            category: req.body.category || 'General',
             restaurantId: req.body.restaurantId
         });
 

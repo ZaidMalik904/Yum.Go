@@ -40,7 +40,7 @@ const Footer = () => {
                             <li><a href="/#home" className='text-slate-500 hover:text-[tomato] no-underline text-sm font-bold transition-colors'>Home</a></li>
                             <li><a href="/#restaurant-display" className='text-slate-500 hover:text-[tomato] no-underline text-sm font-bold transition-colors'>Restaurants</a></li>
                             <li><a href="/#about-us" className='text-slate-500 hover:text-[tomato] no-underline text-sm font-bold transition-colors'>About YumGo</a></li>
-                            <li><Link to='/privacy' className='text-slate-500 hover:text-[tomato] no-underline text-sm font-bold transition-colors'>Privacy Policy</Link></li>
+
                             <li><Link to='/support' className='text-slate-500 hover:text-[tomato] no-underline text-sm font-bold transition-colors'>Support Center</Link></li>
                         </ul>
                     </div>

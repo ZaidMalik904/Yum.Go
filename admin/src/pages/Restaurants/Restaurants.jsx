@@ -3,6 +3,8 @@ import axios from 'axios'
 import { toast } from 'react-toastify'
 import { Store, CheckCircle, XCircle, MapPin, Phone, Mail, Search, Filter, Trash2, Building2 } from 'lucide-react'
 
+
+
 const Restaurants = ({ url }) => {
     const [restaurants, setRestaurants] = useState([])
     const [loading, setLoading] = useState(true)
@@ -39,6 +41,8 @@ const Restaurants = ({ url }) => {
             toast.error("Failed to update status")
         }
     }
+
+
 
     const removeVendor = async (id) => {
         if (!window.confirm("Are you sure you want to remove this vendor? All their listings will remain but the vendor account will be deleted.")) return;
@@ -161,7 +165,6 @@ const Restaurants = ({ url }) => {
                                 </div>
                             </div>
 
-                            {/* Card Body */}
                             <div className="p-7 flex-1 flex flex-col">
                                 <h2 className="text-xl font-black text-slate-900 mb-5 leading-tight">{item.name}</h2>
 

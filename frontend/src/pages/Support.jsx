@@ -22,6 +22,21 @@ const Support = () => {
         chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
 
+    const fetchUserTickets = React.useCallback(async () => {
+        if (!token) return;
+        setLoading(true);
+        try {
+            const response = await axios.post(url + "/api/support/user-tickets", {}, { headers: { token } });
+            if (response.data.success) {
+                setTickets(response.data.data);
+            }
+        } catch {
+            toast.error("Error fetching tickets");
+        } finally {
+            setLoading(false);
+        }
+    }, [url, token])
+
     useEffect(() => {
         scrollToBottom();
     }, [activeTicket]);
@@ -58,20 +73,7 @@ const Support = () => {
         };
     }, [activeTicket, url, token]);
 
-    const fetchUserTickets = React.useCallback(async () => {
-        if (!token) return;
-        setLoading(true);
-        try {
-            const response = await axios.post(url + "/api/support/user-tickets", {}, { headers: { token } });
-            if (response.data.success) {
-                setTickets(response.data.data);
-            }
-        } catch {
-            toast.error("Error fetching tickets");
-        } finally {
-            setLoading(false);
-        }
-    }, [url, token])
+
 
     const onFormChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });

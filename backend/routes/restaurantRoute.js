@@ -18,6 +18,7 @@ restaurantRouter.post("/register", upload.single("image"), registerRestaurant);
 restaurantRouter.get("/list", listRestaurants);
 restaurantRouter.get("/details/:id", getRestaurantDetails);
 restaurantRouter.post("/update-status", updateStatus);
+
 restaurantRouter.post("/remove", removeRestaurant);
 
 export default restaurantRouter;

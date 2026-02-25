@@ -9,6 +9,7 @@ const restaurantSchema = new mongoose.Schema({
     phone: { type: String, required: true },
     rating: { type: Number, default: 0 },
     isApproved: { type: Boolean, default: false }, // Admin will approve vendors
+
     description: { type: String }
 }, { timestamps: true });
 

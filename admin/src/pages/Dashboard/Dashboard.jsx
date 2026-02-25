@@ -21,8 +21,7 @@ export default function Dashboard({ url }) {
         totalVendors: 0,
         totalItems: 0,
         recentOrders: [],
-        monthlySales: new Array(12).fill(0),
-        topCategories: {}
+        monthlySales: new Array(12).fill(0)
     })
     const [loading, setLoading] = useState(true)
     const [hoverMonth, setHoverMonth] = useState(null)
@@ -41,16 +40,10 @@ export default function Dashboard({ url }) {
                 const foods = iR.data.foods
 
                 const monthly = new Array(12).fill(0)
-                const categoryCount = {}
-
                 orders.forEach(o => {
                     const date = new Date(o.date)
                     const monthIdx = date.getMonth()
                     monthly[monthIdx] += o.amount
-
-                    o.items.forEach(item => {
-                        categoryCount[item.category] = (categoryCount[item.category] || 0) + item.quantity
-                    })
                 })
 
                 setStats({
@@ -59,8 +52,7 @@ export default function Dashboard({ url }) {
                     totalVendors: vR.data.data.length,
                     totalItems: foods.length,
                     recentOrders: orders.slice(-5).reverse(),
-                    monthlySales: monthly,
-                    topCategories: categoryCount
+                    monthlySales: monthly
                 })
             }
         } catch (e) {
@@ -207,54 +199,27 @@ export default function Dashboard({ url }) {
 
             </div>
 
-            {/* --- Category & Insights --- */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="bg-white p-8 rounded-[40px] border border-slate-100 shadow-premium">
-                    <h2 className="text-xl font-black text-slate-900 tracking-tight mb-8">Popular Categories</h2>
-                    <div className="flex flex-col gap-6">
-                        {(() => {
-                            const entries = Object.entries(stats.topCategories).sort((a, b) => b[1] - a[1]).slice(0, 4);
-                            const maxQty = entries.length > 0 ? entries[0][1] : 1;
-                            return entries.map(([name, qty], i) => (
-                                <div key={i}>
-                                    <div className="flex justify-between items-center mb-3">
-                                        <span className="text-sm font-black text-slate-700 tracking-tight">{name}</span>
-                                        <span className="text-xs font-black text-primary uppercase tracking-widest">{qty} sold</span>
-                                    </div>
-                                    <div className="h-2.5 bg-slate-50 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full rounded-full transition-all duration-1000 ease-out"
-                                            style={{
-                                                width: `${(qty / maxQty) * 100}%`,
-                                                background: `linear-gradient(90deg, #ff6347, ${['#ff4500', '#3b82f6', '#22c55e', '#a855f7'][i % 4]})`
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                            ));
-                        })()}
-                        {Object.keys(stats.topCategories).length === 0 && (
-                            <div className="text-center py-10 text-slate-300 font-bold text-sm">No category data synchronization active</div>
-                        )}
-                    </div>
-                </div>
-
-                <div className="bg-[#0f172a] p-10 rounded-[40px] flex flex-col relative overflow-hidden group">
+            {/* --- System Performance --- */}
+            <div className="grid grid-cols-1 gap-8">
+                <div className="bg-[#0f172a] p-10 rounded-[40px] flex flex-col md:flex-row items-center justify-between relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-[#ff6347] opacity-[0.03] rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:opacity-[0.05] transition-opacity duration-1000"></div>
 
-                    <div className="w-14 h-14 bg-[#ff6347]/10 rounded-2xl flex items-center justify-center mb-8 animate-pulse">
-                        <Zap size={26} className="text-primary" />
+                    <div className="flex flex-col md:flex-row items-center gap-8 flex-1">
+                        <div className="w-14 h-14 bg-[#ff6347]/10 rounded-2xl flex items-center justify-center animate-pulse shrink-0">
+                            <Zap size={26} className="text-primary" />
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-black text-white tracking-tight mb-2">System Integrity</h2>
+                            <p className="text-[13px] text-slate-400 font-medium leading-relaxed max-w-xl">All core services are performing at peak efficiency. Real-time data sync is active via global relay servers ensuring 100% database synchronization.</p>
+                        </div>
                     </div>
 
-                    <h2 className="text-2xl font-black text-white tracking-tight mb-3">System Integrity</h2>
-                    <p className="text-[13px] text-slate-400 font-medium leading-relaxed mb-10 max-w-sm">All core services are performing at peak efficiency. Real-time data sync is active via global relay servers.</p>
-
-                    <div className="mt-auto flex flex-col gap-3.5">
+                    <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto mt-8 md:mt-0">
                         {[
                             { label: 'Cloud Database', val: '99.9% Uptime', color: 'text-green-400' },
                             { label: 'Security Firewall', val: 'Protected', color: 'text-blue-400' }
                         ].map((stat, i) => (
-                            <div key={i} className="flex justify-between items-center p-4 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors duration-300">
+                            <div key={i} className="flex justify-between items-center gap-8 p-4 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors duration-300 min-w-[200px]">
                                 <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">{stat.label}</span>
                                 <span className={`text-xs font-black ${stat.color} uppercase tracking-tighter`}>{stat.val}</span>
                             </div>

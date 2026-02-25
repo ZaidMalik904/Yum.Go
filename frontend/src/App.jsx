@@ -6,7 +6,7 @@ import Cart from './pages/Cart'
 import PlaceOrder from './pages/PlaceOrder'
 import Footer from './components/Footer'
 import LoginPopup from './components/LoginPopup'
-import PrivacyPolicy from './pages/PrivacyPolicy'
+
 
 
 import FloatingCart from './components/FloatingCart'
@@ -23,13 +23,13 @@ const App = () => {
   return (
     <>
       {showLogin ? <LoginPopup setShowLogin={setShowLogin} /> : <></>}
-      <div className='app w-full overflow-x-hidden'>
+      <div className='app w-full overflow-x-hidden pt-20 md:pt-24'>
         <Navbar setShowLogin={setShowLogin} />
         <Routes>
           <Route path='/' element={<Home setShowLogin={setShowLogin} />} />
           <Route path='/cart' element={<Cart setShowLogin={setShowLogin} />} />
           <Route path='/place-order' element={<PlaceOrder />} />
-          <Route path='/privacy' element={<PrivacyPolicy />} />
+
           <Route path='/restaurant/:id' element={<Restaurant setShowLogin={setShowLogin} />} />
 
 

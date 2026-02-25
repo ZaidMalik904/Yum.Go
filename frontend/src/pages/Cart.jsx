@@ -68,7 +68,7 @@ const Cart = ({ setShowLogin }) => {
                                             </div>
 
                                             <div className='flex-1 flex flex-col gap-2 text-center sm:text-left'>
-                                                <span className='text-[tomato] font-black text-[10px] uppercase tracking-[0.2em]'>{item.category}</span>
+
                                                 <h3 className='text-xl font-black text-[#0f172a]'>{item.name}</h3>
                                                 <p className='text-slate-400 text-sm font-medium line-clamp-1'>Precision crafted culinary masterpiece.</p>
                                                 <div className='flex items-center justify-center sm:justify-start gap-4 mt-2'>

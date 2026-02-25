@@ -17,7 +17,7 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 const App = () => {
-  const url = "https://yum-go.onrender.com"
+  const url = "http://localhost:4000" // "https://yum-go.onrender.com"
   const [token, setToken] = useState(localStorage.getItem("token") || "")
   const [adminData, setAdminData] = useState(JSON.parse(localStorage.getItem("adminData")) || null)
 
@@ -57,7 +57,7 @@ const App = () => {
           boxShadow: '0 20px 40px rgba(0,0,0,0.12)',
           fontFamily: "'Outfit', sans-serif",
           fontWeight: 700,
-          border: '1px solid #f1f5f9',
+          border: '1px solid #f1f5e9',
         }}
       />
 

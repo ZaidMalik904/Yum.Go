@@ -13,9 +13,10 @@ const Add = ({ url }) => {
     try {
       const res = await axios.get(`${url}/api/restaurant/list`)
       if (res.data.success) {
-        setRestaurants(res.data.data)
-        if (res.data.data.length > 0)
-          setData(p => ({ ...p, restaurantId: res.data.data[0]._id }))
+        const approvedOnly = res.data.data.filter(r => r.isApproved)
+        setRestaurants(approvedOnly)
+        if (approvedOnly.length > 0)
+          setData(p => ({ ...p, restaurantId: approvedOnly[0]._id }))
       }
     } catch { toast.error('Error fetching restaurants') }
   }, [url])
@@ -124,17 +125,20 @@ const Add = ({ url }) => {
             />
           </div>
 
-          {/* Price */}
-          <div className="max-w-sm space-y-3">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[2px] ml-1 flex items-center gap-2">
-              <DollarSign size={14} className="text-primary" /> Premium Valuaton ($)
-            </p>
-            <div className="relative">
-              <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 font-extrabold">$</div>
-              <input
-                className="admin-input pl-10" name="price" type="number" value={data.price}
-                placeholder="25.00" required onChange={onChange}
-              />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Price */}
+            <div className="space-y-3">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[2px] ml-1 flex items-center gap-2">
+                <DollarSign size={14} className="text-primary" /> Premium Valuation ($)
+              </p>
+              <div className="flex items-center gap-2 bg-white border-2 border-slate-100 rounded-2xl px-5 focus-within:border-primary/30 focus-within:ring-4 focus-within:ring-primary/5 transition-all outline-none h-[58px]">
+                <span className="text-slate-400 font-black text-sm select-none">$</span>
+                <input
+                  className="flex-1 bg-transparent border-none outline-none font-black text-slate-700 placeholder:text-slate-200 text-sm"
+                  name="price" type="number" value={data.price}
+                  placeholder="0.00" required onChange={onChange}
+                />
+              </div>
             </div>
           </div>
 

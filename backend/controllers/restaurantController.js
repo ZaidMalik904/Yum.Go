@@ -15,6 +15,7 @@ const registerRestaurant = async (req, res) => {
         }
 
         const salt = await bcrypt.genSalt(10);
+        const { name, email, password, address, phone, description } = req.body;
         const hashedPassword = await bcrypt.hash(password, salt);
 
         const newRestaurant = new restaurantModel({
@@ -24,6 +25,7 @@ const registerRestaurant = async (req, res) => {
             address,
             phone,
             description,
+
             image: image_filename
         });
 
@@ -59,6 +61,8 @@ const updateStatus = async (req, res) => {
         res.json({ success: false, message: "Error updating status" });
     }
 }
+
+
 
 // Remove Restaurant
 const removeRestaurant = async (req, res) => {

@@ -4,11 +4,12 @@ import { StoreContext } from '../context/StoreContext'
 import FoodItem from '../components/FoodItem'
 import { MapPin, Phone, Mail, ChevronLeft } from 'lucide-react'
 
+
+
 const Restaurant = ({ setShowLogin }) => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { restaurant_list, food_list, url, searchQuery } = useContext(StoreContext);
-    const [category, setCategory] = useState("All");
     const [expanded, setExpanded] = useState(false);
 
     const restaurant = useMemo(() => {
@@ -26,12 +27,8 @@ const Restaurant = ({ setShowLogin }) => {
 
     const restaurantFoods = food_list.filter(food =>
         food.restaurantId === id &&
-        (category === "All" || food.category === category) &&
         (!searchQuery || food.name.toLowerCase().includes(searchQuery.toLowerCase()) || food.description?.toLowerCase().includes(searchQuery.toLowerCase()))
     );
-
-    // Get unique categories for this restaurant
-    const restaurantCategories = ["All", ...new Set(food_list.filter(f => f.restaurantId === id).map(f => f.category))];
 
     const displayFoods = expanded ? restaurantFoods : restaurantFoods.slice(0, 4);
 
@@ -119,19 +116,6 @@ const Restaurant = ({ setShowLogin }) => {
                     <div>
                         <h2 className='text-3xl md:text-4xl font-black text-[#262626] tracking-tight'>Available Menu</h2>
                         <div className='w-20 h-1.5 bg-[tomato] rounded-full mt-2'></div>
-                    </div>
-
-                    {/* Category Filter */}
-                    <div className='flex gap-4 overflow-x-auto no-scrollbar py-2 max-w-full'>
-                        {restaurantCategories.map(cat => (
-                            <button
-                                key={cat}
-                                onClick={() => { setCategory(cat); setExpanded(false); }}
-                                className={`px-6 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all duration-300 ${category === cat ? 'bg-[tomato] text-white shadow-lg shadow-[tomato]/30 scale-105' : 'bg-white text-gray-500 border border-gray-100 hover:border-[tomato]/30 hover:scale-105'}`}
-                            >
-                                {cat}
-                            </button>
-                        ))}
                     </div>
                 </div>
 
