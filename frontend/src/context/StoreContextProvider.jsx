@@ -8,7 +8,14 @@ const StoreContextProvider = (props) => {
     const [restaurant_list, setRestaurantList] = useState([]);
     const [cartItems, setCartItems] = useState({});
     const [menu, setMenu] = useState("home");
-    const [userData, setUserData] = useState(null);
+    const [userData, setUserData] = useState(() => {
+        const savedUser = localStorage.getItem("userData");
+        try {
+            return savedUser ? JSON.parse(savedUser) : null;
+        } catch {
+            return null;
+        }
+    });
 
     const [searchQuery, setSearchQuery] = useState("");
     const [discount, setDiscount] = useState(0);
@@ -26,6 +33,7 @@ const StoreContextProvider = (props) => {
             const response = await axios.get(url + "/api/user/profile", { headers: { token: tkn } });
             if (response.data.success) {
                 setUserData(response.data.user);
+                localStorage.setItem("userData", JSON.stringify(response.data.user));
             }
         } catch (error) {
             console.error("Fetch profile error:", error);
