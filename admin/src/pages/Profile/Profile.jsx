@@ -181,22 +181,24 @@ const Profile = ({ url, token, adminData, setAdminData }) => {
                 </div>
 
                 {/* ── Save Button ── */}
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className={`w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all duration-300 shadow-lg active:scale-95 ${saved
-                        ? 'bg-green-500 text-white shadow-green-200'
-                        : 'bg-primary text-white hover:bg-primary/90 shadow-primary/20'
-                        }`}
-                >
-                    {loading ? (
-                        <Loader2 className="animate-spin" size={20} />
-                    ) : saved ? (
-                        <><CheckCircle2 size={20} /> Saved Successfully</>
-                    ) : (
-                        <><Save size={18} /> Save Changes</>
-                    )}
-                </button>
+                <div className="sticky bottom-4 md:static mt-8 z-20 bg-slate-50/80 backdrop-blur-md p-2 rounded-3xl md:bg-transparent md:backdrop-blur-none md:p-0">
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className={`w-full flex items-center justify-center gap-3 py-5 rounded-2xl font-black text-sm uppercase tracking-widest transition-all duration-300 shadow-xl active:scale-95 ${saved
+                            ? 'bg-green-500 text-white shadow-green-200'
+                            : 'bg-gradient-to-r from-primary to-[#ff4500] text-white hover:shadow-primary/40'
+                            }`}
+                    >
+                        {loading ? (
+                            <Loader2 className="animate-spin" size={20} />
+                        ) : saved ? (
+                            <><CheckCircle2 size={22} /> Saved Successfully</>
+                        ) : (
+                            <><Save size={20} /> Save Changes</>
+                        )}
+                    </button>
+                </div>
             </form>
         </div>
     )

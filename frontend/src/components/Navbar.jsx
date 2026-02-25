@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { StoreContext } from '../context/StoreContext';
-import { ShoppingCart, LogOut, User, Menu, X, ChevronDown, Search } from 'lucide-react';
+import { ShoppingCart, LogOut, User, Menu, X, ChevronDown, Search, Mail } from 'lucide-react';
 import { assets } from '../assets/assets';
 
 const Navbar = ({ setShowLogin }) => {
@@ -58,7 +58,7 @@ const Navbar = ({ setShowLogin }) => {
     const cartCount = Object.values(cartItems || {}).reduce((a, b) => a + b, 0);
 
     return (
-        <header className="fixed top-0 left-0 w-full z-[100] bg-white/95 backdrop-blur-md border-b border-slate-100">
+        <header className="absolute md:fixed top-0 left-0 w-full z-[99999] bg-white border-b border-slate-200 md:bg-white/95 md:backdrop-blur-md md:border-slate-100 shadow-sm transition-all">
             {/* Custom Animations */}
             <style>
                 {`
@@ -222,7 +222,7 @@ const Navbar = ({ setShowLogin }) => {
 
                     {/* Mobile Toggle */}
                     <button
-                        className="lg:hidden w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-50 text-slate-900 focus:outline-none"
+                        className="lg:hidden w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-50 text-slate-900 focus:outline-none relative z-[100001]"
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                     >
                         {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -231,58 +231,110 @@ const Navbar = ({ setShowLogin }) => {
             </div>
 
             {/* --- Mobile Nav Overlay --- */}
-            <div className={`lg:hidden fixed inset-0 bg-white z-[110] transition-transform duration-500 ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-                <div className='p-8 pt-24 h-full flex flex-col gap-10'>
-                    <div className='flex flex-col gap-8'>
-                        {[
-                            { name: 'Home', id: 'home', path: '/#home' },
-                            { name: 'Featured Restaurants', id: 'restaurants', path: '/#restaurant-display' },
-                            { name: 'Our Story', id: 'about-us', path: '/#about-us' },
-                            { name: 'Contact Us', id: 'contact-us', path: '/#footer' }
-                        ].map((item) => (
-                            <a
-                                key={item.id}
-                                href={item.path}
-                                onClick={() => { setMenu(item.id); setIsMenuOpen(false); }}
-                                className={`text-3xl font-black no-underline tracking-tighter ${menu === item.id ? "text-[tomato]" : "text-slate-900"}`}
-                            >
-                                {item.name}
-                            </a>
-                        ))}
+            <div className={`lg:hidden fixed inset-0 z-[100000] transition-all duration-500 ease-in-out ${isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+                {/* Backdrop Blur */}
+                <div
+                    className={`absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-500 ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`}
+                    onClick={() => setIsMenuOpen(false)}
+                />
+
+                {/* Menu Content */}
+                <div className={`absolute right-0 top-0 h-full w-[85%] max-w-[400px] bg-white shadow-[-20px_0_60px_rgba(0,0,0,0.1)] transition-transform duration-500 ease-[cubic-bezier(0.32,0,0.07,1)] ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'} overflow-y-auto flex flex-col`}>
+
+                    {/* Header in Menu */}
+                    <div className='p-6 pt-10 flex items-center justify-between border-b border-slate-50'>
+                        <div className='flex items-center gap-2'>
+                            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
+                                <img src={assets.logo} alt="" className="w-5 h-5 invert brightness-0" />
+                            </div>
+                            <span className="text-xl font-black text-slate-900 tracking-[-0.5px]">YumGo<span className="text-primary">.</span></span>
+                        </div>
                     </div>
 
-                    <div className='mt-auto flex flex-col gap-4'>
-                        {!token ? (
-                            <button
-                                onClick={() => { setShowLogin(true); setMenu("signin"); setIsMenuOpen(false); }}
-                                className='w-full py-5 bg-[tomato] text-white font-black rounded-3xl text-lg shadow-xl shadow-[tomato]/20'
-                            >
-                                Get Started
-                            </button>
-                        ) : (
-                            <div className='flex flex-col gap-4'>
-                                {/* Mobile User Info */}
-                                <div className='flex items-center gap-4 pb-6 mb-2 border-b border-slate-100'>
-                                    <div className='w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0'>
-                                        {userData?.image ? (
-                                            <img src={url + "/images/" + userData.image} alt={userData.name} className='w-full h-full object-cover' />
-                                        ) : (
-                                            <div className='w-full h-full bg-gradient-to-br from-[#ff6347] to-[#ff4500] flex items-center justify-center text-white text-lg font-black'>
-                                                {getInitials(userData?.name)}
-                                            </div>
-                                        )}
+                    <div className='p-6 flex flex-col gap-8'>
+                        {/* Navigation Section */}
+                        <div className='flex flex-col gap-2'>
+                            <p className='text-[10px] font-black text-slate-400 uppercase tracking-[2px] mb-2 px-4'>Navigation</p>
+                            {[
+                                { name: 'Home', id: 'home', path: '/#home', icon: <User size={18} /> },
+                                { name: 'Featured Restaurants', id: 'restaurants', path: '/#restaurant-display', icon: <ShoppingCart size={18} /> },
+                                { name: 'Our Story', id: 'about-us', path: '/#about-us', icon: <Search size={18} /> },
+                                { name: 'Contact Us', id: 'contact-us', path: '/#footer', icon: <Mail size={18} /> }
+                            ].map((item) => (
+                                <a
+                                    key={item.id}
+                                    href={item.path}
+                                    onClick={() => { setMenu(item.id); setIsMenuOpen(false); }}
+                                    className={`flex items-center gap-4 px-4 py-4 rounded-2xl transition-all duration-300 ${menu === item.id ? "bg-primary-light text-primary" : "text-slate-600 hover:bg-slate-50"}`}
+                                >
+                                    <div className={`p-2 rounded-xl flex items-center justify-center ${menu === item.id ? "bg-white text-primary shadow-sm" : "bg-slate-100 text-slate-400"}`}>
+                                        {item.icon}
                                     </div>
-                                    <div>
-                                        <p className='text-lg font-black text-slate-900'>{userData?.name || 'User'}</p>
-                                        <p className='text-xs text-slate-400 font-medium'>{userData?.email || ''}</p>
+                                    <span className="text-lg font-bold">{item.name}</span>
+                                </a>
+                            ))}
+                        </div>
+
+                        {/* User / Auth Section */}
+                        <div className='mt-4'>
+                            {!token ? (
+                                <div className='p-6 rounded-[32px] bg-slate-900 text-white relative overflow-hidden group'>
+                                    <div className='relative z-10'>
+                                        <p className='text-sm font-bold text-slate-400 mb-1'>Join our community</p>
+                                        <h3 className='text-2xl font-black mb-4'>Ready to order?</h3>
+                                        <button
+                                            onClick={() => { setShowLogin(true); setMenu("signin"); setIsMenuOpen(false); }}
+                                            className='w-full py-4 bg-primary text-white font-black rounded-2xl text-base shadow-lg shadow-primary/30 active:scale-95 transition-all'
+                                        >
+                                            Get Started Free
+                                        </button>
+                                    </div>
+                                    <div className='absolute -right-4 -bottom-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700'></div>
+                                </div>
+                            ) : (
+                                <div className='flex flex-col gap-6'>
+                                    <p className='text-[10px] font-black text-slate-400 uppercase tracking-[2px] mb-[-8px] px-4'>My Identity</p>
+
+                                    {/* Mobile User Card */}
+                                    <div className='bg-slate-50 rounded-[32px] p-5 flex items-center gap-4 border border-slate-100'>
+                                        <div className='w-14 h-14 rounded-2xl overflow-hidden shadow-md shrink-0 border-2 border-white bg-white'>
+                                            {userData?.image ? (
+                                                <img src={url + "/images/" + userData.image} alt={userData.name} className='w-full h-full object-cover' />
+                                            ) : (
+                                                <div className='w-full h-full bg-gradient-to-br from-[#ff6347] to-[#ff4500] flex items-center justify-center text-white text-lg font-black'>
+                                                    {getInitials(userData?.name)}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="min-w-0">
+                                            <p className='text-[16px] font-black text-slate-900 truncate'>{userData?.name || 'User'}</p>
+                                            <p className='text-[11px] text-slate-400 font-bold truncate tracking-tight'>{userData?.email || ''}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className='flex flex-col gap-2'>
+                                        <button onClick={() => { navigate('/profile'); setIsMenuOpen(false); }} className='flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-700 hover:bg-slate-50 transition-all'>
+                                            <div className='p-2.5 rounded-xl bg-primary-light text-primary'><User size={20} /></div>
+                                            <span className='font-bold text-base'>Account Profile</span>
+                                        </button>
+                                        <button onClick={() => { navigate('/my-orders'); setIsMenuOpen(false); }} className='flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-700 hover:bg-slate-50 transition-all'>
+                                            <div className='p-2.5 rounded-xl bg-blue-50 text-blue-500'><ShoppingCart size={20} /></div>
+                                            <span className='font-bold text-base'>Active Orders</span>
+                                        </button>
+                                        <div className='h-px bg-slate-100 my-2 mx-4'></div>
+                                        <button onClick={() => { logout(); setIsMenuOpen(false); }} className='flex items-center gap-4 px-4 py-4 rounded-2xl text-red-500 hover:bg-red-50 transition-all'>
+                                            <div className='p-2.5 rounded-xl bg-red-100/50 text-red-500'><LogOut size={20} /></div>
+                                            <span className='font-extrabold text-base'>Logout Securely</span>
+                                        </button>
                                     </div>
                                 </div>
-                                <button onClick={() => { navigate('/profile'); setIsMenuOpen(false); }} className='flex items-center gap-4 text-slate-900 text-2xl font-black no-underline'><User size={28} className='text-[tomato]' /> My Profile</button>
-                                <button onClick={() => { navigate('/my-orders'); setIsMenuOpen(false); }} className='flex items-center gap-4 text-slate-900 text-2xl font-black no-underline'><ShoppingCart size={28} className='text-blue-500' /> Live Orders</button>
-                                <button onClick={() => { logout(); setIsMenuOpen(false); }} className='flex items-center gap-4 text-slate-400 text-xl font-bold'><LogOut size={24} /> Log Out</button>
-                            </div>
-                        )}
-                        <p className='text-center text-slate-300 text-xs font-bold uppercase tracking-widest pt-8 border-t'>© 2026 YumGo Delivery</p>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className='mt-auto p-8 border-t border-slate-50 flex flex-col items-center gap-1'>
+                        <p className='text-[10px] text-slate-300 font-black uppercase tracking-[3px]'>YumGo Marketplace</p>
+                        <p className='text-[11px] text-slate-400 font-bold italic'>Delivering Happiness Daily</p>
                     </div>
                 </div>
             </div>
