@@ -8,4 +8,4 @@ export const assets = {
     parcel_icon
 }
 
-export const url = 'http://localhost:4000' // 'https://yum-go.onrender.com'
+export const url = 'https://yum-go.onrender.com'
