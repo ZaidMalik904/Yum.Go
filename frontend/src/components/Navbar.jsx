@@ -154,59 +154,65 @@ const Navbar = ({ setShowLogin }) => {
                         <div className='relative' ref={profileRef}>
                             <button
                                 onClick={() => setShowProfile(!showProfile)}
-                                className={`flex items-center gap-3 p-1.5 pr-4 rounded-2xl border-2 transition-all ${showProfile ? 'border-[tomato] bg-white shadow-lg' : 'border-transparent bg-slate-50 hover:border-slate-200'}`}
+                                className={`flex items-center gap-3.5 p-1.5 pr-5 rounded-[20px] border-2 transition-all duration-300 ${showProfile ? 'border-[tomato] bg-white shadow-xl scale-105' : 'border-transparent bg-slate-50 hover:bg-slate-100 hover:border-slate-200'}`}
                             >
-                                <div className='w-10 h-10 rounded-xl shadow-sm flex items-center justify-center overflow-hidden shrink-0'>
+                                <div className='w-10 h-10 rounded-2xl shadow-md flex items-center justify-center overflow-hidden shrink-0 border-2 border-white'>
                                     {userData?.image ? (
                                         <img src={url + "/images/" + userData.image} alt={userData.name} className='w-full h-full object-cover' />
                                     ) : (
-                                        <div className='w-full h-full bg-gradient-to-br from-[#ff6347] to-[#ff4500] flex items-center justify-center text-white text-xs font-black'>
+                                        <div className='w-full h-full bg-gradient-to-br from-[#ff6347] to-[#ff4500] flex items-center justify-center text-white text-[13px] font-black'>
                                             {getInitials(userData?.name)}
                                         </div>
                                     )}
                                 </div>
                                 <div className='hidden sm:flex flex-col items-start leading-[1.2]'>
-                                    <span className='text-[10px] text-slate-400 font-bold uppercase tracking-widest'>Welcome</span>
-                                    <span className='text-xs font-black text-slate-900 truncate max-w-[100px]'>{userData?.name?.split(' ')[0] || 'User'}</span>
+                                    <span className='text-[10px] text-[tomato] font-bold uppercase tracking-[1.5px]'>Verified</span>
+                                    <span className='text-sm font-black text-slate-900 truncate max-w-[120px]'>{userData?.name?.split(' ')[0] || 'Member'}</span>
                                 </div>
-                                <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${showProfile ? 'rotate-180' : ''}`} />
+                                <ChevronDown size={14} className={`text-slate-400 transition-transform duration-500 ${showProfile ? 'rotate-180' : ''}`} />
                             </button>
 
                             {/* Dropdown Menu - EXACTLY LIKE ADMIN STYLE */}
                             {showProfile && (
-                                <div className='absolute right-0 top-[calc(100%+12px)] w-64 bg-white rounded-[28px] shadow-[0_25px_60px_rgba(0,0,0,0.12)] border border-slate-100 p-2.5 z-[200] animate-fadeInDown'>
+                                <div className='absolute right-0 top-[calc(100%+14px)] w-[280px] bg-white rounded-[32px] shadow-[0_30px_70px_rgba(0,0,0,0.15)] border border-slate-100 p-3 z-[200] animate-fadeInDown origin-top-right'>
                                     {/* Profile Summary Header */}
-                                    <div className='flex items-center gap-3.5 p-4 bg-gradient-to-br from-[tomato]/5 to-transparent rounded-[20px] mb-2'>
-                                        <div className='w-12 h-12 rounded-2xl overflow-hidden shadow-sm flex-shrink-0'>
+                                    <div className='flex items-center gap-4 p-4.5 bg-gradient-to-br from-[tomato]/10 via-[tomato]/5 to-transparent rounded-[24px] mb-3'>
+                                        <div className='w-14 h-14 rounded-2xl overflow-hidden shadow-lg flex-shrink-0 border-[3px] border-white'>
                                             {userData?.image ? (
                                                 <img src={url + "/images/" + userData.image} alt={userData.name} className='w-full h-full object-cover' />
                                             ) : (
-                                                <div className='w-full h-full bg-gradient-to-br from-[#ff6347] to-[#ff4500] flex items-center justify-center text-white text-sm font-black'>
+                                                <div className='w-full h-full bg-gradient-to-br from-[#ff6347] to-[#ff4500] flex items-center justify-center text-white text-lg font-black'>
                                                     {getInitials(userData?.name)}
                                                 </div>
                                             )}
                                         </div>
                                         <div className='min-w-0'>
-                                            <p className='text-sm font-black text-slate-900 truncate m-0'>{userData?.name || 'User'}</p>
-                                            <p className='text-[11px] text-slate-400 font-semibold truncate mt-0.5'>{userData?.email || ''}</p>
+                                            <p className='text-[15px] font-black text-slate-900 truncate m-0'>{userData?.name || 'Guest User'}</p>
+                                            <p className='text-[11px] text-slate-400 font-bold truncate mt-1 tracking-tight'>{userData?.email || ''}</p>
                                         </div>
                                     </div>
 
-                                    <div className='flex flex-col gap-1'>
-                                        <button onClick={() => { navigate('/profile'); setShowProfile(false); }} className='w-full flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-600 text-[13px] font-bold text-left transition-colors'>
-                                            <User size={18} className='text-[tomato]' />
+                                    <div className='flex flex-col gap-1.5'>
+                                        <button onClick={() => { navigate('/profile'); setShowProfile(false); }} className='w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl hover:bg-slate-50 text-slate-600 text-sm font-bold text-left transition-all hover:text-[tomato] group'>
+                                            <div className='p-2 rounded-xl bg-orange-50 text-[tomato] group-hover:bg-[tomato] group-hover:text-white transition-colors'>
+                                                <User size={18} />
+                                            </div>
                                             My Identity
                                         </button>
-                                        <button onClick={() => { navigate('/my-orders'); setShowProfile(false); }} className='w-full flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-600 text-[13px] font-bold text-left transition-colors'>
-                                            <ShoppingCart size={18} className='text-blue-500' />
+                                        <button onClick={() => { navigate('/my-orders'); setShowProfile(false); }} className='w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl hover:bg-slate-50 text-slate-600 text-sm font-bold text-left transition-all hover:text-blue-600 group'>
+                                            <div className='p-2 rounded-xl bg-blue-50 text-blue-500 group-hover:bg-blue-600 group-hover:text-white transition-colors'>
+                                                <ShoppingCart size={18} />
+                                            </div>
                                             Order History
                                         </button>
                                     </div>
 
-                                    <div className='h-px bg-slate-100 my-2 mx-3'></div>
+                                    <div className='h-px bg-slate-100 my-3 mx-4'></div>
 
-                                    <button onClick={logout} className='w-full flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-red-50 text-red-500 text-[13px] font-extrabold text-left transition-colors'>
-                                        <LogOut size={18} />
+                                    <button onClick={logout} className='w-full flex items-center gap-4 px-5 py-4 rounded-2xl hover:bg-red-50 text-red-500 text-sm font-extrabold text-left transition-all group'>
+                                        <div className='p-2 rounded-xl bg-red-100/50 text-red-500 group-hover:bg-red-500 group-hover:text-white transition-colors'>
+                                            <LogOut size={18} />
+                                        </div>
                                         Secure Logout
                                     </button>
                                 </div>
