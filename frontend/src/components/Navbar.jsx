@@ -58,6 +58,19 @@ const Navbar = ({ setShowLogin }) => {
 
     return (
         <header className="fixed top-0 left-0 w-full z-[100] bg-white/95 backdrop-blur-md border-b border-slate-100">
+            {/* Custom Animations */}
+            <style>
+                {`
+                    @keyframes fadeInDown {
+                        from { opacity: 0; transform: translateY(-10px); }
+                        to { opacity: 1; transform: translateY(0); }
+                    }
+                    .animate-fadeInDown {
+                        animation: fadeInDown 0.3s ease-out forwards;
+                    }
+                `}
+            </style>
+
             <div className="max-w-[1440px] mx-auto px-6 md:px-[5vw] h-20 md:h-24 flex justify-between items-center">
 
                 {/* --- Logo Area --- */}
@@ -91,7 +104,7 @@ const Navbar = ({ setShowLogin }) => {
                                 <a
                                     href={item.path}
                                     onClick={() => setMenu(item.id)}
-                                    className={`px - 6 py - 3 rounded - 2xl text - sm font - bold transition - all no - underline ${menu === item.id ? "text-[tomato] bg-[#fff0ed]" : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"} `}
+                                    className={`px-6 py-3 rounded-2xl text-sm font-bold transition-all no-underline ${menu === item.id ? "text-[tomato] bg-[#fff0ed]" : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"}`}
                                 >
                                     {item.name}
                                 </a>
@@ -140,11 +153,11 @@ const Navbar = ({ setShowLogin }) => {
                         <div className='relative' ref={profileRef}>
                             <button
                                 onClick={() => setShowProfile(!showProfile)}
-                                className={`flex items - center gap - 3 p - 1.5 pr - 4 rounded - 2xl border - 2 transition - all ${showProfile ? 'border-[tomato] bg-white shadow-lg' : 'border-transparent bg-slate-50 hover:border-slate-200'} `}
+                                className={`flex items-center gap-3 p-1.5 pr-4 rounded-2xl border-2 transition-all ${showProfile ? 'border-[tomato] bg-white shadow-lg' : 'border-transparent bg-slate-50 hover:border-slate-200'}`}
                             >
                                 <div className='w-10 h-10 rounded-xl shadow-sm flex items-center justify-center overflow-hidden shrink-0'>
                                     {userData?.image ? (
-                                        <img src={`${url} /images/${userData.image} `} alt={userData.name} className='w-full h-full object-cover' />
+                                        <img src={url + "/images/" + userData.image} alt={userData.name} className='w-full h-full object-cover' />
                                     ) : (
                                         <div className='w-full h-full bg-gradient-to-br from-[#ff6347] to-[#ff4500] flex items-center justify-center text-white text-xs font-black'>
                                             {getInitials(userData?.name)}
@@ -155,7 +168,7 @@ const Navbar = ({ setShowLogin }) => {
                                     <span className='text-[10px] text-slate-400 font-bold uppercase tracking-widest'>Welcome</span>
                                     <span className='text-xs font-black text-slate-900 truncate max-w-[100px]'>{userData?.name?.split(' ')[0] || 'User'}</span>
                                 </div>
-                                <ChevronDown size={14} className={`text - slate - 400 transition - transform duration - 300 ${showProfile ? 'rotate-180' : ''} `} />
+                                <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${showProfile ? 'rotate-180' : ''}`} />
                             </button>
 
                             {/* Dropdown Menu - EXACTLY LIKE ADMIN STYLE */}
@@ -165,7 +178,7 @@ const Navbar = ({ setShowLogin }) => {
                                     <div className='flex items-center gap-3.5 p-4 bg-gradient-to-br from-[tomato]/5 to-transparent rounded-[20px] mb-2'>
                                         <div className='w-12 h-12 rounded-2xl overflow-hidden shadow-sm flex-shrink-0'>
                                             {userData?.image ? (
-                                                <img src={`${url} /images/${userData.image} `} alt={userData.name} className='w-full h-full object-cover' />
+                                                <img src={url + "/images/" + userData.image} alt={userData.name} className='w-full h-full object-cover' />
                                             ) : (
                                                 <div className='w-full h-full bg-gradient-to-br from-[#ff6347] to-[#ff4500] flex items-center justify-center text-white text-sm font-black'>
                                                     {getInitials(userData?.name)}
@@ -211,7 +224,7 @@ const Navbar = ({ setShowLogin }) => {
             </div>
 
             {/* --- Mobile Nav Overlay --- */}
-            <div className={`lg:hidden fixed inset - 0 bg - white z - [110] transition - transform duration - 500 ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'} `}>
+            <div className={`lg:hidden fixed inset-0 bg-white z-[110] transition-transform duration-500 ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
                 <div className='p-8 pt-24 h-full flex flex-col gap-10'>
                     <div className='flex flex-col gap-8'>
                         {[
@@ -224,7 +237,7 @@ const Navbar = ({ setShowLogin }) => {
                                 key={item.id}
                                 href={item.path}
                                 onClick={() => { setMenu(item.id); setIsMenuOpen(false); }}
-                                className={`text - 3xl font - black no - underline tracking - tighter ${menu === item.id ? "text-[tomato]" : "text-slate-900"} `}
+                                className={`text-3xl font-black no-underline tracking-tighter ${menu === item.id ? "text-[tomato]" : "text-slate-900"}`}
                             >
                                 {item.name}
                             </a>
@@ -245,7 +258,7 @@ const Navbar = ({ setShowLogin }) => {
                                 <div className='flex items-center gap-4 pb-6 mb-2 border-b border-slate-100'>
                                     <div className='w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0'>
                                         {userData?.image ? (
-                                            <img src={`${url} /images/${userData.image} `} alt={userData.name} className='w-full h-full object-cover' />
+                                            <img src={url + "/images/" + userData.image} alt={userData.name} className='w-full h-full object-cover' />
                                         ) : (
                                             <div className='w-full h-full bg-gradient-to-br from-[#ff6347] to-[#ff4500] flex items-center justify-center text-white text-lg font-black'>
                                                 {getInitials(userData?.name)}
