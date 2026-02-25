@@ -17,7 +17,7 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 const App = () => {
-  const url = "http://localhost:4000" // "https://yum-go.onrender.com"
+  const url = "https://yum-go.onrender.com"
   const [token, setToken] = useState(localStorage.getItem("token") || "")
   const [adminData, setAdminData] = useState(JSON.parse(localStorage.getItem("adminData")) || null)
 
