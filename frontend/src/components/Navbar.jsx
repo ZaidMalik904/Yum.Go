@@ -5,10 +5,23 @@ import { ShoppingCart, LogOut, User, Menu, X, ChevronDown, Search } from 'lucide
 import { assets } from '../assets/assets';
 
 const Navbar = ({ setShowLogin }) => {
-    const { token, setToken, menu, setMenu, cartItems, setSearchQuery, userData, url } = useContext(StoreContext);
+    const { token, setToken, menu, setMenu, cartItems, setSearchQuery, userData, setUserData, url } = useContext(StoreContext);
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [showProfile, setShowProfile] = useState(false);
     const [navSearch, setNavSearch] = useState("");
+    const profileRef = useRef(null);
+
+    // Close profile dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (profileRef.current && !profileRef.current.contains(event.target)) {
+                setShowProfile(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     const handleSearch = (e) => {
         setNavSearch(e.target.value);
@@ -32,6 +45,7 @@ const Navbar = ({ setShowLogin }) => {
     const logout = () => {
         localStorage.removeItem("token");
         setToken("");
+        setUserData(null);
         navigate("/");
     };
 
@@ -43,7 +57,7 @@ const Navbar = ({ setShowLogin }) => {
     const cartCount = Object.values(cartItems || {}).reduce((a, b) => a + b, 0);
 
     return (
-        <header className="fixed top-0 left-0 w-full z-[100] bg-white border-b border-slate-100">
+        <header className="fixed top-0 left-0 w-full z-[100] bg-white/95 backdrop-blur-md border-b border-slate-100">
             <div className="max-w-[1440px] mx-auto px-6 md:px-[5vw] h-20 md:h-24 flex justify-between items-center">
 
                 {/* --- Logo Area --- */}
@@ -123,9 +137,12 @@ const Navbar = ({ setShowLogin }) => {
                             Sign In
                         </button>
                     ) : (
-                        <div className='relative group hidden md:block'>
-                            <button className='flex items-center gap-3 p-2 pr-4 bg-slate-50 rounded-2xl border border-transparent hover:border-slate-200 transition-all'>
-                                <div className='w-10 h-10 rounded-xl shadow-sm flex items-center justify-center overflow-hidden'>
+                        <div className='relative' ref={profileRef}>
+                            <button
+                                onClick={() => setShowProfile(!showProfile)}
+                                className={`flex items-center gap-3 p-1.5 pr-4 rounded-2xl border-2 transition-all ${showProfile ? 'border-[tomato] bg-white shadow-lg' : 'border-transparent bg-slate-50 hover:border-slate-200'}`}
+                            >
+                                <div className='w-10 h-10 rounded-xl shadow-sm flex items-center justify-center overflow-hidden shrink-0'>
                                     {userData?.image ? (
                                         <img src={`${url}/images/${userData.image}`} alt={userData.name} className='w-full h-full object-cover' />
                                     ) : (
@@ -134,34 +151,52 @@ const Navbar = ({ setShowLogin }) => {
                                         </div>
                                     )}
                                 </div>
-                                <div className='flex flex-col items-start'>
+                                <div className='hidden sm:flex flex-col items-start leading-[1.2]'>
                                     <span className='text-[10px] text-slate-400 font-bold uppercase tracking-widest'>Welcome</span>
-                                    <span className='text-xs font-bold text-slate-700 max-w-[80px] truncate'>{userData?.name?.split(' ')[0] || 'User'}</span>
+                                    <span className='text-xs font-black text-slate-900 truncate max-w-[100px]'>{userData?.name?.split(' ')[0] || 'User'}</span>
                                 </div>
-                                <ChevronDown size={14} className='text-slate-400 transition-transform group-hover:rotate-180' />
+                                <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${showProfile ? 'rotate-180' : ''}`} />
                             </button>
 
-                            {/* Dropdown Menu */}
-                            <div className='absolute right-0 top-full mt-3 w-56 bg-white rounded-3xl shadow-2xl border border-slate-100 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform translate-y-2 group-hover:translate-y-0'>
-                                {/* User Info Header */}
-                                <div className='px-4 py-3 border-b border-slate-100 mb-1'>
-                                    <p className='text-sm font-bold text-slate-800 truncate'>{userData?.name || 'User'}</p>
-                                    <p className='text-xs text-slate-400 truncate'>{userData?.email || ''}</p>
+                            {/* Dropdown Menu - EXACTLY LIKE ADMIN STYLE */}
+                            {showProfile && (
+                                <div className='absolute right-0 top-[calc(100%+12px)] w-64 bg-white rounded-[28px] shadow-[0_25px_60px_rgba(0,0,0,0.12)] border border-slate-100 p-2.5 z-[200] animate-fadeInDown'>
+                                    {/* Profile Summary Header */}
+                                    <div className='flex items-center gap-3.5 p-4 bg-gradient-to-br from-[tomato]/5 to-transparent rounded-[20px] mb-2'>
+                                        <div className='w-12 h-12 rounded-2xl overflow-hidden shadow-sm flex-shrink-0'>
+                                            {userData?.image ? (
+                                                <img src={`${url}/images/${userData.image}`} alt={userData.name} className='w-full h-full object-cover' />
+                                            ) : (
+                                                <div className='w-full h-full bg-gradient-to-br from-[#ff6347] to-[#ff4500] flex items-center justify-center text-white text-sm font-black'>
+                                                    {getInitials(userData?.name)}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className='min-w-0'>
+                                            <p className='text-sm font-black text-slate-900 truncate m-0'>{userData?.name || 'User'}</p>
+                                            <p className='text-[11px] text-slate-400 font-semibold truncate mt-0.5'>{userData?.email || ''}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className='flex flex-col gap-1'>
+                                        <button onClick={() => { navigate('/profile'); setShowProfile(false); }} className='w-full flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-600 text-[13px] font-bold text-left transition-colors'>
+                                            <User size={18} className='text-[tomato]' />
+                                            My Identity
+                                        </button>
+                                        <button onClick={() => { navigate('/my-orders'); setShowProfile(false); }} className='w-full flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-600 text-[13px] font-bold text-left transition-colors'>
+                                            <ShoppingCart size={18} className='text-blue-500' />
+                                            Order History
+                                        </button>
+                                    </div>
+
+                                    <div className='h-px bg-slate-100 my-2 mx-3'></div>
+
+                                    <button onClick={logout} className='w-full flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-red-50 text-red-500 text-[13px] font-extrabold text-left transition-colors'>
+                                        <LogOut size={18} />
+                                        Secure Logout
+                                    </button>
                                 </div>
-                                <button onClick={() => navigate('/profile')} className='w-full flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-600 text-sm font-bold text-left'>
-                                    <User size={18} className='text-[tomato]' />
-                                    My Profile
-                                </button>
-                                <button onClick={() => navigate('/my-orders')} className='w-full flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-600 text-sm font-bold text-left'>
-                                    <ShoppingCart size={18} className='text-blue-500' />
-                                    My Orders
-                                </button>
-                                <div className='h-px bg-slate-100 my-1 mx-4'></div>
-                                <button onClick={logout} className='w-full flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-[#fff0ed] text-slate-600 hover:text-[tomato] text-sm font-bold text-left'>
-                                    <LogOut size={18} />
-                                    Sign Out
-                                </button>
-                            </div>
+                            )}
                         </div>
                     )}
 

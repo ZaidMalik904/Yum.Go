@@ -18,20 +18,33 @@ const Profile = () => {
     const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
 
+    const [fetchError, setFetchError] = useState(false);
+
     useEffect(() => {
         if (!token) {
             navigate('/');
             return;
         }
+
+        // Set a timeout to detect if profile loading is hanging
+        const timeout = setTimeout(() => {
+            if (!userData) {
+                setFetchError(true);
+            }
+        }, 10000); // 10 seconds timeout
+
         if (!userData) {
             fetchUserProfile(token);
         } else {
+            setFetchError(false);
             setFormData({
                 name: userData.name || '',
                 email: userData.email || '',
                 phone: userData.phone || ''
             });
         }
+
+        return () => clearTimeout(timeout);
     }, [userData, token, navigate, fetchUserProfile]);
 
     const handleChange = (e) => {
@@ -92,8 +105,25 @@ const Profile = () => {
 
     if (!userData) {
         return (
-            <div className="min-h-[70vh] grid place-items-center">
-                <div className="w-[60px] h-[60px] border-4 border-slate-200 border-t-[tomato] rounded-full animate-spin"></div>
+            <div className="min-h-[70vh] flex flex-col items-center justify-center gap-4">
+                {fetchError ? (
+                    <div className="text-center px-6">
+                        <div className="text-red-500 text-5xl mb-4">⚠️</div>
+                        <h2 className="text-xl font-bold text-slate-800 mb-2">Profile Loading Failed</h2>
+                        <p className="text-slate-500 mb-6 max-w-xs mx-auto">We couldn't fetch your profile info. Please check your internet or try logging in again.</p>
+                        <button
+                            onClick={() => window.location.reload()}
+                            className="bg-[tomato] text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-[tomato]/20"
+                        >
+                            Retry Loading
+                        </button>
+                    </div>
+                ) : (
+                    <>
+                        <div className="w-[60px] h-[60px] border-4 border-slate-200 border-t-[tomato] rounded-full animate-spin"></div>
+                        <p className="text-slate-400 font-bold animate-pulse">Fetching your identity...</p>
+                    </>
+                )}
             </div>
         );
     }
