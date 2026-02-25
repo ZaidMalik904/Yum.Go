@@ -47,6 +47,11 @@ const StoreContextProvider = (props) => {
                     setFoodList(foodRes.data.foods || []);
                     setRestaurantList(restRes.data.data || []);
                 }
+
+                // Fetch profile if token exists on mount
+                if (token && isMounted) {
+                    fetchUserProfile(token);
+                }
             } catch (error) {
                 console.error("Initial load error:", error);
             }
@@ -57,7 +62,7 @@ const StoreContextProvider = (props) => {
         return () => {
             isMounted = false;
         };
-    }, [url]);
+    }, [url, token]);
 
     const addToCart = async (itemId) => {
         setCartItems((prev) => {

@@ -23,14 +23,16 @@ const Profile = () => {
             navigate('/');
             return;
         }
-        if (userData) {
+        if (!userData) {
+            fetchUserProfile(token);
+        } else {
             setFormData({
                 name: userData.name || '',
                 email: userData.email || '',
                 phone: userData.phone || ''
             });
         }
-    }, [userData, token, navigate]);
+    }, [userData, token, navigate, fetchUserProfile]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
