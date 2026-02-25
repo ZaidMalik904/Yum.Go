@@ -24,7 +24,7 @@ const App = () => {
   return (
     <>
       {showLogin ? <LoginPopup setShowLogin={setShowLogin} /> : <></>}
-      <div className='app w-full overflow-x-hidden pt-0 md:pt-24'>
+      <div className='app w-full overflow-x-hidden pt-20 md:pt-24'>
         <Routes>
           <Route path='/' element={<Home setShowLogin={setShowLogin} />} />
           <Route path='/cart' element={<Cart setShowLogin={setShowLogin} />} />

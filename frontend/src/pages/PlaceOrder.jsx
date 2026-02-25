@@ -67,7 +67,7 @@ const PlaceOrder = () => {
     }, [token, getTotalCartAmount, navigate])
 
     return (
-        <div className='checkout-logistics py-16 md:py-24 px-[5vw] bg-[#fcfdfd] min-h-screen'>
+        <div className='checkout-logistics pt-6 pb-16 md:pt-10 md:pb-24 px-[5vw] bg-[#fcfdfd] min-h-screen'>
             {/* Header */}
             <div className='flex items-center gap-4 mb-10 md:mb-16'>
                 <div className='w-12 h-12 md:w-14 md:h-14 bg-[#0f172a] rounded-2xl flex items-center justify-center shadow-lg'>

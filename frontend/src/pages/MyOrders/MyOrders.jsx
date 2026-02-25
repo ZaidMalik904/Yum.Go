@@ -45,7 +45,7 @@ const MyOrders = () => {
     }
 
     return (
-        <div className='my-orders my-[50px] pt-[80px] px-[5vw] max-w-[1400px] mx-auto animate-fadeIn'>
+        <div className='my-orders mb-[50px] pt-[20px] px-[5vw] max-w-[1400px] mx-auto animate-fadeIn'>
             <div className='flex items-center gap-4 mb-10'>
                 <div className='w-12 h-12 bg-[tomato] rounded-2xl flex items-center justify-center shadow-lg'>
                     <Package className='text-white' size={24} />

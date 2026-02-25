@@ -143,7 +143,7 @@ const Support = () => {
     }
 
     return (
-        <div className='support-page py-10 md:py-24 px-4 md:px-[5vw] bg-[#fcfdfe] min-h-screen'>
+        <div className='support-page pt-6 pb-10 md:pt-10 md:pb-24 px-4 md:px-[5vw] bg-[#fcfdfe] min-h-screen'>
             {/* Header */}
             <div className='flex flex-col md:flex-row md:items-end justify-between gap-8 mb-10'>
                 <div className='flex items-center gap-4'>

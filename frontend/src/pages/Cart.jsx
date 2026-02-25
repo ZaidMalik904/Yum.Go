@@ -29,7 +29,7 @@ const Cart = ({ setShowLogin }) => {
     const cartHasItems = Object.values(cartItems).some(count => count > 0);
 
     return (
-        <div className='cart py-16 md:py-24 px-[5vw] bg-[#fcfdfd] min-h-screen'>
+        <div className='cart pt-6 pb-16 md:pt-10 md:pb-24 px-[5vw] bg-[#fcfdfd] min-h-screen'>
             {/* Header */}
             <div className='flex items-center gap-4 mb-8 md:mb-12'>
                 <div className='w-12 h-12 md:w-14 md:h-14 bg-[tomato] rounded-2xl flex items-center justify-center shadow-lg shadow-[tomato]/20'>
